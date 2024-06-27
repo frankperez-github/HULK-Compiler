@@ -1,0 +1,4 @@
+ipython==8.12.3
+nbformat==5.10.4
+ply==3.11
+pydot==2.0.0

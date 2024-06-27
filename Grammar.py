@@ -1,10 +1,3 @@
-from cmp.pycompiler import Symbol
-from cmp.pycompiler import NonTerminal
-from cmp.pycompiler import Terminal
-from cmp.pycompiler import EOF
-from cmp.pycompiler import Sentence, SentenceList
-from cmp.pycompiler import Epsilon
-from cmp.pycompiler import Production
 from cmp.pycompiler import Grammar
 
 from cmp.utils import pprint, inspect
