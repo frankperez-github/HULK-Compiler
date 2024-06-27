@@ -272,7 +272,3 @@ def export_to_md(automaton, filename):
 # print(ndfa_to_dfa.evaluate("010110112")) # should return False
 
 # export_to_md(ndfa_to_dfa, "ndfa_to_dfa.md")
-
-dfa = DFA.getDFA(Token("for", "FOR"))
-export_to_md(dfa, "getDFA.md")
-print(dfa.evaluate("foreach"))

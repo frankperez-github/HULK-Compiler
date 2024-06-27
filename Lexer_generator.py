@@ -1,5 +1,6 @@
-from cmp import Token
+from cmp.utils import Token
 from Automatons import *
+from Grammar import G
 
 class Lexer:
     def __init__(self):
@@ -24,4 +25,8 @@ class Lexer_Generator:
 
     def Generate(self, G):
         for token in G.terminals:
-            export_to_md(DFA.getDFA(token.lex), token.lex+".md")
+            export_to_md(DFA.getDFA(token), "./automatasMD/"+token.lex+".md")
+
+
+lexer = Lexer_Generator()
+lexer.Generate(G)
