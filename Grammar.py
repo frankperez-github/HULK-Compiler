@@ -185,10 +185,10 @@ atom %= base_ + opar + opt_arg_lis + cpar, lambda h,s: nodes.BaseCallNode(s[3])
 
 
 dec_meth %= id_ + opar + opt_param_lis + cpar + opt_type + arrow + expr_simp + semicolon, (
-                                                lambda h,s: nodes.FunctionDeclarationNode(s[1],s[3],s[7],s[5])
+                                                lambda h,s: nodes.MethodDeclarationNode(s[1],s[3],s[7],s[5])
                                                )
-dec_meth %= id_ + opar + opt_param_lis + cpar + opt_type + expr_bloq , lambda h,s: nodes.FunctionDeclarationNode(s[1],s[3],s[6],s[5])
-dec_meth %= id_ + opar + opt_param_lis + cpar + opt_type + expr_bloq + semicolon , lambda h,s: nodes.FunctionDeclarationNode(s[1],s[3],s[6],s[5])
+dec_meth %= id_ + opar + opt_param_lis + cpar + opt_type + expr_bloq , lambda h,s: nodes.MethodDeclarationNode(s[1],s[3],s[6],s[5])
+dec_meth %= id_ + opar + opt_param_lis + cpar + opt_type + expr_bloq + semicolon , lambda h,s: nodes.MethodDeclarationNode(s[1],s[3],s[6],s[5])
 
 opt_type %= G.Epsilon, lambda h,s: None
 opt_type %= colon + type_ann, lambda h,s: s[2]
@@ -197,7 +197,7 @@ type_ann %= id_, lambda h,s: s[1]
 type_ann %= type_ann + ocor + ccor, lambda h,s: nodes.VectorTypeAnnotationNode(s[1]) 
 
 opt_param_lis %= param_lis, lambda h,s: s[1]
-opt_param_lis %= G.Epsilon, lambda h,s: None
+opt_param_lis %= G.Epsilon, lambda h,s: []
 
 param_lis %= param, lambda h,s: [s[1]]
 param_lis %= param_lis + semi + param, lambda h,s: s[1] + [s[3]]
@@ -236,7 +236,7 @@ opt_her %= inherits + id_ , lambda h,s: s[2]
 opt_her %= G.Epsilon, lambda h,s: None
 
 optional_param %= opar + param_lis + cpar, lambda h,s: s[2]
-optional_param %= G.Epsilon, lambda h,s: None
+optional_param %= G.Epsilon, lambda h,s: []
 
 #dec_func %= function + dec_meth, lambda h,s: s[2]
 dec_func %= function + id_ + opar + opt_param_lis + cpar + opt_type + arrow + expr_simp + semicolon, (lambda h,s: nodes.FunctionDeclarationNode(s[2],s[4],s[8],s[6]))
@@ -244,7 +244,7 @@ dec_func %= function + id_ + opar + opt_param_lis + cpar + opt_type + expr_bloq 
 dec_func %= function + id_ + opar + opt_param_lis + cpar + opt_type + expr_bloq + semicolon , lambda h,s: nodes.FunctionDeclarationNode(s[2],s[4],s[7],s[6])
 
 
-feature_lis_or_eps %= G.Epsilon, lambda h,s: None
+feature_lis_or_eps %= G.Epsilon, lambda h,s: []
 feature_lis_or_eps%= feature_lis, lambda h,s: s[1]
 
 feature_lis %= feature_lis + attr, lambda h,s: s[1] + [s[3]]
@@ -258,7 +258,7 @@ attr %= id_ + opt_type + s_as + end_expr, lambda h,s: nodes.AttributeDeclaration
 
 func_call %= id_ + opar + opt_arg_lis + cpar, lambda h,s: nodes.FunctionCallNode(s[1],s[3])
 
-opt_arg_lis %= G.Epsilon, lambda h,s: None
+opt_arg_lis %= G.Epsilon, lambda h,s: []
 opt_arg_lis %= arg_lis, lambda h,s: s[1]
 
 arg_lis %= expr, lambda h,s: [s[1]]
@@ -272,7 +272,7 @@ opt_ext %= extends + id_, lambda h,s: s[2]
 func_lis %= func_lis + sing_func, lambda h,s: s[1] + [s[2]]
 func_lis %= sing_func, lambda h,s: [s[1]]
 
-sing_func %= id_ + opar + ob_params_ann_lis_or_eps + cpar + colon + type_ann +semicolon, lambda h,s: nodes.MethodDeclarationNode(s[1],s[3],s[6])
+sing_func %= id_ + opar + ob_params_ann_lis_or_eps + cpar + colon + type_ann +semicolon, lambda h,s: nodes.MethodSignatureDeclarationNode(s[1],s[3],s[6])
 
 ob_params_ann_lis_or_eps %= ob_params_ann_lis, lambda h,s: s[1]
 ob_params_ann_lis_or_eps %= G.Epsilon, lambda h,s: None
@@ -285,7 +285,7 @@ ob_params_ann %= id_ + colon + type_ann, lambda h,s: (s[1],s[3])
 vector_innit %= ocor + opt_arg_lis + ccor, lambda h,s: nodes.VectorInitializationNode(s[2])
 vector_innit %= ocor + expr + d_bar + id_ + in_ + expr + ccor, lambda h,s: nodes.VectorComprehensionNode(s[2],s[4],s[6])
 
-from cmp.tools.parsing import LR1Parser
-parser = LR1Parser(G)
+#from cmp.tools.parsing import LR1Parser
+#parser = LR1Parser(G)
 
 
