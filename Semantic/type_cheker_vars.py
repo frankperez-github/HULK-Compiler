@@ -1,4 +1,4 @@
-import Grammar.AST_nodes as nodes
+import AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
 from utils import Context, Scope, Function, VariableInfo
@@ -41,11 +41,11 @@ class VarCollector(object):
             return
 
         # Set parent arguments when they are None
-        if node.parent_args is None and node.params_ids is not None:
+        if node.parent_args is None:
             node.parent_args = []
 
         # Set params cause in the type builder I didn't have the params of my parent
-        if node.parent_args is None and node.params_ids is None:
+        if node.parent_args == [] and node.params_ids == []:
             self.current_type.set_params()
             node.params_ids, node.params_types = self.current_type.params_names, self.current_type.params_types
             # After this I know that my parent's args are my params (are just variables with its params names)
@@ -146,7 +146,7 @@ class VarCollector(object):
     @visitor.when(nodes.DestructiveAssignmentNode)
     def visit(self, node: nodes.DestructiveAssignmentNode, scope: Scope):
         node.scope = scope
-        self.visit(node.target, scope.create_child())
+        self.visit(node.id, scope.create_child())
         self.visit(node.expr, scope.create_child())
 
     @visitor.when(nodes.BinaryExpressionNode)

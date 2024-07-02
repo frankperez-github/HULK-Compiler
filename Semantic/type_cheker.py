@@ -1,4 +1,4 @@
-import Grammar.AST_nodes as nodes
+import AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
 from utils import Context, Scope, Function, VariableInfo
@@ -31,7 +31,7 @@ class TypeChecker(object):
     
     @visitor.when(nodes.TypeDeclarationNode)
     def visit(self, node: nodes.TypeDeclarationNode):
-        self.current_type = self.context.get_type(node.idx)
+        self.current_type = self.context.get_type(node.id)
 
         if self.current_type.is_error():
             return
@@ -61,13 +61,13 @@ class TypeChecker(object):
                 self.errors.append(HulkSemanticError(error_text))
 
         self.current_type = None
+        
 
     @visitor.when(nodes.AttributeDeclarationNode)
     def visit(self, node: nodes.AttributeDeclarationNode):
         inf_type = self.visit(node.expr)
 
         attr_type = self.current_type.get_attribute(node.id).type
-
         if not inf_type.conforms_to(attr_type):
             error_text = HulkSemanticError.INCOMPATIBLE_TYPES % (inf_type.name, attr_type.name)
             self.errors.append(HulkSemanticError(error_text))
@@ -161,7 +161,7 @@ class TypeChecker(object):
     @visitor.when(nodes.DestructiveAssignmentNode)
     def visit(self, node: nodes.DestructiveAssignmentNode):
         new_type = self.visit(node.expr)
-        old_type = self.visit(node.target)
+        old_type = self.visit(node.id)
 
         if old_type.name == 'Self':
             self.errors.append(HulkSemanticError(HulkSemanticError.SELF_IS_READONLY))
@@ -220,7 +220,7 @@ class TypeChecker(object):
         args_types = [self.visit(arg) for arg in node.args]
 
         try:
-            function = self.context.get_function(node.idx)
+            function = self.context.get_function(node.id)
         except HulkSemanticError as e:
             self.errors.append(e)
             for arg in node.args:
@@ -335,7 +335,7 @@ class TypeChecker(object):
         bool_type = self.context.get_type('Boolean')
 
         try:
-            self.context.get_type_or_protocol(node.ttype)
+            self.context.get_type_or_protocol(node.type)
         except HulkSemanticError as e:
             self.errors.append(e)
 
@@ -347,7 +347,7 @@ class TypeChecker(object):
         expression_type = self.visit(node.expression)
 
         try:
-            cast_type = self.context.get_type_or_protocol(node.ttype)
+            cast_type = self.context.get_type_or_protocol(node.type)
         except HulkSemanticError as e:
             self.errors.append(e)
             cast_type = ErrorType()
@@ -485,7 +485,7 @@ class TypeChecker(object):
     @visitor.when(nodes.TypeInstantiationNode)
     def visit(self, node: nodes.TypeInstantiationNode):
         try:
-            ttype = self.context.get_type(node.idx, params_len=len(node.args))
+            ttype = self.context.get_type(node.id, params_len=len(node.args))
         except HulkSemanticError as e:
             self.errors.append(e)
             return ErrorType()
@@ -560,7 +560,7 @@ class TypeChecker(object):
 
     @visitor.when(nodes.ProtocolDeclarationNode)
     def visit(self, node: nodes.ProtocolDeclarationNode):
-        self.current_type = self.context.get_protocol(node.idx)
+        self.current_type = self.context.get_protocol(node.id)
         for method in node.methods_signature:
             self.visit(method)
         self.current_type = None

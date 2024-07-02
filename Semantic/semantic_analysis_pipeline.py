@@ -50,7 +50,7 @@ def semantic_analysis_pipeline(ast, debug=False):
     inference_errors = context.inference_errors() + scope.inference_errors()
     errors.extend(inference_errors)
     if debug:
-        print('Iterations: ' + str(type_inferrer.current_iteration))
+        #print('Iterations: ' + str(type_inferrer.current_iteration))
         print('Errors: [')
         for error in errors:
             print('\t', error)

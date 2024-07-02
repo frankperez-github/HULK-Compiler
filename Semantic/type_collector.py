@@ -1,4 +1,5 @@
-import Grammar.AST_nodes as nodes
+import AST_nodes as nodes
+#import Grammar.AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
 from utils import Context
@@ -69,16 +70,16 @@ class TypeCollector(object):
     @visitor.when(nodes.TypeDeclarationNode)
     def visit(self, node:nodes.TypeDeclarationNode):
         try:
-            self.context.create_type(node.idx, node)
+            self.context.create_type(node.id, node)
         except HulkSemanticError as e:
             self.errors.append(e)
-            self.context.set_type_or_protocol_error(node.idx)
+            self.context.set_type_or_protocol_error(node.id)
 
     @visitor.when(nodes.ProtocolDeclarationNode)
     def visit(self, node: nodes.ProtocolDeclarationNode):
         try:
-            self.context.create_protocol(node.idx, node)
+            self.context.create_protocol(node.id, node)
         except HulkSemanticError as e:
             self.errors.append(e)
-            self.context.set_type_or_protocol_error(node.idx)
+            self.context.set_type_or_protocol_error(node.id)
 

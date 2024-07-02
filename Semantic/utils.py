@@ -1,6 +1,6 @@
 from errors import HulkSemanticError
-from types import Type, Protocol, AutoType, ErrorType, VectorType
-from Grammar import AST_nodes
+from types_ import Type, Protocol, AutoType, ErrorType, VectorType
+import AST_nodes
 import itertools as itt
 
 class Function:
@@ -11,6 +11,22 @@ class Function:
         self.param_types = param_types
         self.param_vars = []
         self.return_type = return_type
+
+    
+    def inference_errors(self):
+        errors = []
+
+        for i, param_type in enumerate(self.param_types):
+            if isinstance(param_type, AutoType):
+                param_name = self.param_names[i]
+                error_message = HulkSemanticError.CANNOT_INFER_PARAM_TYPE % (param_name, self.name)
+                errors.append(HulkSemanticError(error_message))
+                self.param_types[i] = ErrorType()
+
+        if self.return_type == AutoType() and not self.return_type.is_error():
+            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_RETURN_TYPE % self.name))
+            self.return_type = ErrorType()
+        return errors
 
     def __str__(self):
         params = ', '.join(f'{n}:{t.name}' for n, t in zip(self.param_names, self.param_types))
@@ -91,6 +107,14 @@ class Context:
         except KeyError:
             raise HulkSemanticError(f'Function "{name}" is not defined.')
 
+    
+    def inference_errors(self):
+        errors = []
+        for type_name in self.types:
+            errors.extend(self.types[type_name].inference_errors())
+        for func_name in self.functions:
+            errors.extend(self.functions[func_name].inference_errors())
+        return errors
 
     def __str__(self):
         return ('{\n\t' +
@@ -118,6 +142,20 @@ class VariableInfo:
     def set_type_and_clear_inference_types_list(self, ttype: Type | Protocol):
         self.type = ttype
         self.inferred_types = []
+
+    
+    def inference_errors(self):
+        # If the variable is a parameter, we don't need to report errors because it was already reported
+        if self.type == AutoType() and self.is_parameter:
+            self.type = ErrorType()
+            return []
+
+        errors = []
+        if self.type == AutoType() and not self.type.is_error():
+            self.type = ErrorType()
+            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_VAR_TYPE % self.name))
+
+        return errors
 
     def __str__(self):
         return f'{self.name} : {self.type.name} inf:{[inf.name for inf in self.inferred_types]}'

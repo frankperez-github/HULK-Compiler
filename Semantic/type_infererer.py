@@ -1,4 +1,4 @@
-import Grammar.AST_nodes as nodes
+import AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
 from utils import Context, Scope, Function, VariableInfo
@@ -52,7 +52,7 @@ class TypeInferrer(object):
 
     @visitor.when(nodes.TypeDeclarationNode)
     def visit(self, node: nodes.TypeDeclarationNode):
-        self.current_type = self.context.get_type(node.idx)
+        self.current_type = self.context.get_type(node.id)
 
         if self.current_type.is_error():
             return
@@ -113,7 +113,6 @@ class TypeInferrer(object):
         inf_type = self.visit(node.expr)
 
         attribute = self.current_type.get_attribute(node.id)
-
         if attribute.type.is_error():
             attr_type = ErrorType()
         elif attribute.type != AutoType():
@@ -231,7 +230,7 @@ class TypeInferrer(object):
     @visitor.when(nodes.DestructiveAssignmentNode)
     def visit(self, node: nodes.DestructiveAssignmentNode):
         new_type = self.visit(node.expr)
-        old_type = self.visit(node.target)
+        old_type = self.visit(node.id)
 
         if old_type.name == 'Self':
             return ErrorType()
@@ -289,7 +288,7 @@ class TypeInferrer(object):
         args_types = [self.visit(arg) for arg in node.args]
 
         try:
-            function = self.context.get_function(node.idx)
+            function = self.context.get_function(node.id)
         except HulkSemanticError:
             return ErrorType()
 
@@ -398,7 +397,7 @@ class TypeInferrer(object):
         expr_type = self.visit(node.expression)
 
         try:
-            cast_type = self.context.get_type_or_protocol(node.ttype)
+            cast_type = self.context.get_type_or_protocol(node.type)
         except HulkSemanticError:
             cast_type = ErrorType()
 
@@ -562,7 +561,7 @@ class TypeInferrer(object):
         args_types = [self.visit(arg) for arg in node.args]
 
         try:
-            ttype = self.context.get_type(node.idx)
+            ttype = self.context.get_type(node.id)
         except HulkSemanticError:
             for arg in node.args:
                 self.visit(arg)

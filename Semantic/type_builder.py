@@ -1,4 +1,4 @@
-import Grammar.AST_nodes as nodes
+import AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
 from utils import Context
@@ -43,7 +43,7 @@ class TypeBuilder(object):
     def get_params_names_and_types(self, node):
         # For types that don't specify params
         if node.params_ids is None or node.params_types is None:
-            return None, None
+           return [], []
 
         params_names = []
         params_types = []
@@ -71,7 +71,7 @@ class TypeBuilder(object):
 
     @visitor.when(nodes.TypeDeclarationNode)
     def visit(self, node: nodes.TypeDeclarationNode):
-        self.current_type = self.context.get_type(node.idx)
+        self.current_type = self.context.get_type(node.id)
 
         if self.current_type.is_error():
             return
@@ -80,7 +80,7 @@ class TypeBuilder(object):
 
         # Check if the type is inheriting from a forbidden type
         if node.parent in ['Number', 'Boolean', 'String']:
-            self.errors.append(HulkSemanticError(f'Type {node.idx} is inheriting from a forbidden type  -_-'))
+            self.errors.append(HulkSemanticError(f'Type {node.id} is inheriting from a forbidden type  -_-'))
         elif node.parent is not None:
             try:
                 # Look for a circular dependency
@@ -111,10 +111,11 @@ class TypeBuilder(object):
         for method in node.methods:
             self.visit(method)
 
+        
+
     @visitor.when(nodes.MethodDeclarationNode)
     def visit(self, node: nodes.MethodDeclarationNode):
         params_names, params_types = self.get_params_names_and_types(node)
-
         if node.return_type is None:
             return_type = AutoType()
         else:
@@ -151,7 +152,7 @@ class TypeBuilder(object):
 
     @visitor.when(nodes.ProtocolDeclarationNode)
     def visit(self, node: nodes.ProtocolDeclarationNode):
-        self.current_type = self.context.get_protocol(node.idx)
+        self.current_type = self.context.get_protocol(node.id)
 
         if self.current_type.is_error():
             return

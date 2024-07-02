@@ -6,6 +6,14 @@ class Attribute:
         self.type = typex
         self.node = node
 
+    
+    def inference_errors(self):
+        errors = []
+        if self.type == AutoType() and not self.type.is_error():
+            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_ATTR_TYPE % self.name))
+            self.type = ErrorType()
+        return errors
+    
     def __str__(self):
         return f'[attrib] {self.name} : {self.type.name};'
 
@@ -34,6 +42,22 @@ class Method:
             if not meth_type.conforms_to(impl_type):
                 return False
         return True
+    
+    
+    def inference_errors(self):
+        errors = []
+
+        for i, param_type in enumerate(self.param_types):
+            if isinstance(param_type, AutoType) and not param_type.is_error():
+                param_name = self.param_names[i]
+                error_message = HulkSemanticError.CANNOT_INFER_PARAM_TYPE % (param_name, self.name)
+                errors.append(HulkSemanticError(error_message))
+                self.param_types[i] = ErrorType()
+
+        if self.return_type == AutoType() and not self.return_type.is_error():
+            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_RETURN_TYPE % self.name))
+            self.return_type = ErrorType()
+        return errors
     
     def __str__(self):
         params = ', '.join(f'{n}:{t.name}' for n, t in zip(self.param_names, self.param_types))
@@ -75,7 +99,23 @@ class Protocol:
         self.methods.append(method)
         return method
 
+    
+    def _not_ancestor_conforms_to(self, other):
+        if not isinstance(other, Protocol):
+            return False
+        try:
+            return all(method.can_substitute_with(self.get_method(method.name)) for method in other.methods)
+        # If a method is not defined in the current type (or its ancestors), then it is not conforming
+        except HulkSemanticError:
+            return False
 
+    def conforms_to(self, other):
+        if other == ObjectType():
+            return True
+        elif isinstance(other, Type):
+            return False
+        return self == other or (self.parent is not None and self.parent.conforms_to(
+            other)) or self._not_ancestor_conforms_to(other)
 
     @staticmethod
     def is_error():
@@ -149,6 +189,24 @@ class Type:
         self.methods.append(method)
         return method
     
+    
+    def set_params(self):
+        """
+        Sets the params of the type.
+        If the type doesn't specify them, sets a copy of the params of the lowest ancestor that does it.
+        """
+        params_names, params_types = self.get_params()
+        self.params_names = params_names
+        self.params_types = params_types
+
+    def get_params(self):
+        if (self.params_names == [] or self.params_types == []) and self.parent is not None:
+            params_names, params_types = self.parent.get_params()
+        else:
+            params_names = self.params_names
+            params_types = self.params_types
+        return params_names, params_types
+    
     def conforms_to(self, other):
         if isinstance(other, Type):
             return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
@@ -159,6 +217,23 @@ class Type:
             except HulkSemanticError:
                 return False
 
+
+    def inference_errors(self):
+        if self.is_error():
+            return []
+        errors = []
+        for attr in self.attributes:
+            errors.extend(attr.inference_errors())
+        for method in self.methods:
+            errors.extend(method.inference_errors())
+        for i, param_type in enumerate(self.params_types):
+            if isinstance(param_type, AutoType):
+                param_name = self.params_names[i]
+                error_message = HulkSemanticError.CANNOT_INFER_PARAM_TYPE % (param_name, self.name)
+                errors.append(HulkSemanticError(error_message))
+                self.params_types[i] = ErrorType()
+        return errors
+    
     def is_error(self):
         return False
 
@@ -269,8 +344,17 @@ class VectorType(Type):
         self.define_method('next', [], [], BoolType())
         self.define_method('current', [], [], element_type)
 
+
+    
+    def conforms_to(self, other):
+        if not isinstance(other, VectorType):
+            return super().conforms_to(other)
+        self_elem_type = self.get_element_type()
+        other_elem_type = other.get_element_type()
+        return self_elem_type.conforms_to(other_elem_type)
+    
     def get_element_type(self):
-        return self.get_method('current').return_types
+        return self.get_method('current').return_type
 
     def __eq__(self, other):
         return isinstance(other, VectorType) or other.name == self.name

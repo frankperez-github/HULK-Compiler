@@ -1,4 +1,5 @@
 from abc import ABC
+#from cmp.semantic import Scope
 from cmp.semantic import Scope
 
 class Node(ABC):
@@ -38,19 +39,22 @@ class FunctionDeclarationNode(DeclarationNode):
 class TypeDeclarationNode(DeclarationNode):
     def __init__(self, id_, params, body, parent, parent_args=None):
         super().__init__()
-        if params and len(params) > 0:
+        if len(params) > 0:
             params_ids, params_types = zip(*params)
-        elif params and len(params) == 0:
-            params_ids, params_types = [], []
         else:
-            params_ids, params_types = None, None
+            params_ids, params_types = [], []
+        #elif params and len(params) == 0:
+        #    params_ids, params_types = [], []
+        #else:
+        #    params_ids, params_types = None, None
         self.id = id_
-        self.methods = [method for method in body if isinstance(method, FunctionDeclarationNode)]
+        self.methods = [method for method in body if isinstance(method, MethodDeclarationNode)]
         self.attributes = [attribute for attribute in body if isinstance(attribute, AttributeDeclarationNode)]
         self.params_ids=params_ids
         self.params_types=params_types
         self.parent = parent
         self.parent_args = parent_args
+        
 
 class AttributeDeclarationNode(DeclarationNode):
     def __init__(self, id_, expr, attribute_type=None):
