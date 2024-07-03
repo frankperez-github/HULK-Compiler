@@ -1,4 +1,5 @@
 from abc import ABC
+#from cmp.semantic import Scope
 from cmp.semantic import Scope
 
 class Node(ABC):
@@ -25,20 +26,35 @@ class VectorTypeAnnotationNode(Node):
 class FunctionDeclarationNode(DeclarationNode):
     def __init__(self, id_, params, expr, return_type=None):
         super().__init__()
+        if len(params) > 0:
+            params_ids, params_types = zip(*params)
+        else:
+            params_ids, params_types = [], []
         self.id = id_
-        self.params= params
+        self.params_ids= params_ids
+        self.params_types= params_types
         self.expr = expr
         self.return_type = return_type
 
 class TypeDeclarationNode(DeclarationNode):
     def __init__(self, id_, params, body, parent, parent_args=None):
         super().__init__()
+        if len(params) > 0:
+            params_ids, params_types = zip(*params)
+        else:
+            params_ids, params_types = [], []
+        #elif params and len(params) == 0:
+        #    params_ids, params_types = [], []
+        #else:
+        #    params_ids, params_types = None, None
         self.id = id_
-        self.methods = [method for method in body if isinstance(method, FunctionDeclarationNode)]
+        self.methods = [method for method in body if isinstance(method, MethodDeclarationNode)]
         self.attributes = [attribute for attribute in body if isinstance(attribute, AttributeDeclarationNode)]
-        self.params=params
+        self.params_ids=params_ids
+        self.params_types=params_types
         self.parent = parent
         self.parent_args = parent_args
+        
 
 class AttributeDeclarationNode(DeclarationNode):
     def __init__(self, id_, expr, attribute_type=None):
@@ -48,11 +64,31 @@ class AttributeDeclarationNode(DeclarationNode):
         self.attribute_type = attribute_type
 
 class MethodDeclarationNode(DeclarationNode):
-    def __init__(self, id_, params, return_type):
+    def __init__(self, id_, params,expr, return_type):
         super().__init__()
+        if len(params) > 0:
+            params_ids, params_types = zip(*params)
+        else:
+            params_ids, params_types = [], []
         self.id = id_
-        self.params = params
+        self.params_ids= params_ids
+        self.expr = expr
+        self.params_types = params_types
         self.return_type = return_type
+
+    
+class MethodSignatureDeclarationNode(DeclarationNode):
+    def __init__(self, idx, params, return_type):
+        super().__init__()
+        if len(params) > 0:
+            params_ids, params_types = zip(*params)
+        else:
+            params_ids, params_types = [], []
+        self.id = idx
+        self.params_ids = params_ids
+        self.params_types = params_types
+        self.return_type = return_type
+
 
 class ProtocolDeclarationNode(DeclarationNode):
     def __init__(self, id_, methods_signature, parent):
