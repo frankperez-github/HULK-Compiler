@@ -1,6 +1,3 @@
-from TokenTypes import plus
-from cmp.utils import Token
-
 class State:
     def __init__(self, name, token=None):
         self.name = name
@@ -8,13 +5,13 @@ class State:
         self.token = token
 
     def set_transition(self, char, next_state):
-        if not char in self.transitions:
+        if char not in self.transitions:
             self.transitions[char] = [next_state]
         else:
             self.transitions[char].append(next_state)
 
 class DFA:
-    def __init__(self, start_state:State, final_states):
+    def __init__(self, start_state: State, final_states):
         self.start_state = start_state
         self.final_states = final_states
         self.current_state = start_state
@@ -36,7 +33,7 @@ class DFA:
         dfa.current_state = dfa.start_state
         return dfa
 
-    def evaluate(self, w:str) -> bool:
+    def evaluate(self, w: str) -> bool:
         """
         params: 
             w --> word to evaluate in the language
@@ -44,11 +41,10 @@ class DFA:
             True if w is in language,
             False in other case
         """
-
-        while(len(w) > 0):
-            try: 
+        while len(w) > 0:
+            try:
                 self.current_state = self.current_state.transitions[w[0]][0]
-            except: 
+            except:
                 # If there is not a transition to make, there is not current state any more
                 self.current_state = None
                 break
@@ -80,21 +76,15 @@ class DFA:
                     next_state for next_states in state.transitions.values() for next_state in next_states
                 )
         return visited
-    
+
 
 class NDFA:
-    def __init__(self, start_state:State, final_states):
+    def __init__(self, start_state: State, final_states):
         self.start_state = start_state
         self.final_states = final_states
-        self.current_states = [self.start_state]
+        self.current_states = self.epsilon_closure([self.start_state])
 
-        # At start, start_state is in current states and 
-        # every state reacheable using an epsilon transition from start, is current
-        self.current_states = [start_state]
-        for state in start_state.transitions["ε"]:
-            self.current_states.append(state)
-
-    def evaluate(self, w:str) -> bool:
+    def evaluate(self, w: str) -> bool:
         """
         params: 
             w --> word to evaluate in the language
@@ -102,8 +92,7 @@ class NDFA:
             True if w is in language,
             False in other case
         """
-
-        while(len(w) > 0):
+        while len(w) > 0:
             for curr_state in self.current_states.copy():
                 self.current_states.remove(curr_state)
                 for transition in curr_state.transitions:
@@ -111,34 +100,39 @@ class NDFA:
                         self.current_states += curr_state.transitions[transition]
 
             # In case the automata stops and word is not empty, then fail
-            if(len(self.current_states) == 0 and len(w) > 0): return False
-            
+            if len(self.current_states) == 0 and len(w) > 0:
+                return False
+
             # Consume first character in word
             w = w[1:]
-        
+
         for curr_state in self.current_states:
             if curr_state in self.final_states:
                 return True
         return False
-    
-    def epsilon_closure(self, states:list[State]) -> list[State]:
-        resulting_states = set()
-        if len(states) == 1: 
-            return resulting_states.union(set(states[0].transitions["ε"]) if "ε" in states[0].transitions else [])
-        for state in states:
-            resulting_states.union(set(NDFA.epsilon_closure([state])))
+
+    def epsilon_closure(self, states):
+        resulting_states = set(states)
+        stack = list(states)
+        while stack:
+            state = stack.pop()
+            if 'ε' in state.transitions:
+                for next_state in state.transitions['ε']:
+                    if next_state not in resulting_states:
+                        resulting_states.add(next_state)
+                        stack.append(next_state)
         return list(resulting_states)
 
-    def go_to(self, states:list[State], char:str):
+    def go_to(self, states: list[State], char: str):
         resulting_states = []
         for state in states:
             resulting_states += [
-                                    state.transitions[transition][0] 
-                                        for transition in state.transitions 
-                                            if transition == char and not state.transitions[transition][0] in resulting_states
-                            ]
+                state.transitions[transition][0]
+                for transition in state.transitions
+                if transition == char and state.transitions[transition][0] not in resulting_states
+            ]
         return resulting_states
-    
+
     def to_DFA(self) -> DFA:
         """
         return: deterministic version of the NDFA received
@@ -187,7 +181,116 @@ class NDFA:
                             new_state.set_transition(transition, state_objects[target_state_name])
 
         return dfa
+
+    @classmethod
+    def union(cls, a1, a2):
+        # Create new states
+        start = State('start')
+        final = State('final')
+
+        state_mapping = {a1.start_state: State(f'a1_{a1.start_state.name}'),
+                         a2.start_state: State(f'a2_{a2.start_state.name}')}
+
+        for state in a1._all_states():
+            if state not in state_mapping:
+                state_mapping[state] = State(f'a1_{state.name}')
+
+        for state in a2._all_states():
+            if state not in state_mapping:
+                state_mapping[state] = State(f'a2_{state.name}')
+
+        # Relocate a1 transitions
+        for state in a1._all_states():
+            new_state = state_mapping[state]
+            for char, next_states in state.transitions.items():
+                for next_state in next_states:
+                    new_state.set_transition(char, state_mapping[next_state])
+
+        # Relocate a2 transitions
+        for state in a2._all_states():
+            new_state = state_mapping[state]
+            for char, next_states in state.transitions.items():
+                for next_state in next_states:
+                    new_state.set_transition(char, state_mapping[next_state])
+
+        # Add transitions from start state
+        start.set_transition('ε', state_mapping[a1.start_state])
+        start.set_transition('ε', state_mapping[a2.start_state])
+
+        # Add transitions to final state
+        for final_state in a1.final_states:
+            state_mapping[final_state].set_transition('ε', final)
+        for final_state in a2.final_states:
+            state_mapping[final_state].set_transition('ε', final)
+
+        return cls(start, [final])
+
+    @classmethod
+    def concatenation(cls, a1, a2):
+        start = State('start')
+        final = State('final')
+
+        state_mapping = {a1.start_state: State(f'a1_{a1.start_state.name}'),
+                         a2.start_state: State(f'a2_{a2.start_state.name}')}
+
+        for state in a1._all_states():
+            if state not in state_mapping:
+                state_mapping[state] = State(f'a1_{state.name}')
+
+        for state in a2._all_states():
+            if state not in state_mapping:
+                state_mapping[state] = State(f'a2_{state.name}')
+
+        for state in a1._all_states():
+            new_state = state_mapping[state]
+            for char, next_states in state.transitions.items():
+                for next_state in next_states:
+                    new_state.set_transition(char, state_mapping[next_state])
+
+        for state in a2._all_states():
+            new_state = state_mapping[state]
+            for char, next_states in state.transitions.items():
+                for next_state in next_states:
+                    new_state.set_transition(char, state_mapping[next_state])
+
+        for final_state in a1.final_states:
+            state_mapping[final_state].set_transition('ε', state_mapping[a2.start_state])
+
+        return cls(state_mapping[a1.start_state], [state_mapping[final_state] for final_state in a2.final_states])
+
+    def closure(a1):
+        start = State('start')
+        final = State('final')
         
+        state_mapping = {a1.start_state: State(f'a1_{a1.start_state.name}')}
+
+        for state in a1._all_states():
+            if state not in state_mapping:
+                state_mapping[state] = State(f'a1_{state.name}')
+
+        # Relocate automaton transitions
+        for state in a1._all_states():
+            new_state = state_mapping[state]
+            for symbol, destinations in state.transitions.items():
+                for destination in destinations:
+                    if destination not in state_mapping:
+                        state_mapping[destination] = State(f'a1_{destination.name}')
+                    new_state.set_transition(symbol, state_mapping[destination])
+
+        # Add epsilon transitions from new start state to original start state and final state
+        start.set_transition('ε', state_mapping[a1.start_state])
+        start.set_transition('ε', final)
+
+        # Add epsilon transitions from original final states to final state and back to original start state
+        for final_state in a1.final_states:
+            state_mapping[final_state].set_transition('ε', final)
+            state_mapping[final_state].set_transition('ε', state_mapping[a1.start_state])
+
+        states = list(state_mapping.values()) + [start, final]
+        final_states = [final]
+
+        return NDFA(start, final_states)
+
     def to_mermaid(self) -> str:
         mermaid_str = "stateDiagram-v2\n"
         for state in self._all_states():
@@ -217,58 +320,33 @@ def export_to_md(automaton, filename):
     with open(filename, 'w') as f:
         f.write(md_content)
 
-# ---------------------------------------------------
-
-# Testing DFA
-# start_state = State("start", plus)
-# final_state = State("final", plus)
-
-# start_state.set_transition("0",start_state)
-# start_state.set_transition("1",final_state)
-
-# final_state.set_transition("0",start_state)
-# final_state.set_transition("1",final_state)
 
 
-# final_states = [final_state, start_state]
+# Example usage:
+# a1_start = State('q0')
+# a1_final = State('q1')
+# a1_start.set_transition('a', a1_final)
+# a1 = NDFA(a1_start, [a1_final])
 
-# dfa = DFA(start_state, final_states)
+# a2_start = State('p0')
+# a2_final = State('p1')
+# a2_start.set_transition('b', a2_final)
+# a2 = NDFA(a2_start, [a2_final])
 
-# print(dfa.evaluate("0101011110")) #should return True
-# print(dfa.evaluate("01021011110")) #should return False
-# export_to_md(dfa, 'dfa.md')
+# ndfa_union = NDFA.union(a1, a2)
+# export_to_md(a1, "a1.md")
+# export_to_md(a2, "a2.md")
+# export_to_md(ndfa_union, "union.md")
 
+# ndfa_concatenation = NDFA.concatenation(a1, a2)
+# export_to_md(a1, "a1.md")
+# export_to_md(a2, "a2.md")
+# export_to_md(ndfa_concatenation, "concatenation.md")
 
-# -----------------------------------------------------
+a1_start = State('q0')
+a1_final = State('q1')
+a1_start.set_transition('a', a1_final)
+a1 = NDFA(a1_start, [a1_final])
 
-# Testing NDFA
-# start_state = State("start")
-# q_0 = State("q_0")
-# q_1 = State("q_1")
-
-# start_state.set_transition("ε", q_0)
-# start_state.set_transition("ε", q_1)
-
-# q_0.set_transition("0", q_0)
-# q_0.set_transition("1", q_1)
-
-# q_1.set_transition("1", q_1)
-# q_1.set_transition("0", q_0)
-
-# final_states = [q_0, q_1]
-
-# ndfa = NDFA(start_state, final_states)
-# print(ndfa.evaluate("01011011")) # should return True
-# print(ndfa.evaluate("010110112")) # should return False
-# export_to_md(ndfa, "ndfa.md")
-
-# -----------------------------------------------------
-
-
-
-# NDFA to DFA
-# ndfa_to_dfa = ndfa.to_DFA()
-# print(ndfa_to_dfa.evaluate("01011011")) # should return True
-# print(ndfa_to_dfa.evaluate("010110112")) # should return False
-
-# export_to_md(ndfa_to_dfa, "ndfa_to_dfa.md")
+ndfa_closure = a1.closure()
+export_to_md(ndfa_closure, "closure.md")

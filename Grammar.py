@@ -54,6 +54,7 @@ vector_innit = G.NonTerminal('<vector_innit>')
 
 type_ann = G.NonTerminal('<type_ann>')
 
+
 # Terminals 
 
 obra, cbra, opar, cpar, ocor, ccor, d_bar = G.Terminals('{ } ( ) [ ] ||')
@@ -81,6 +82,7 @@ if_, else_, elif_ = G.Terminals('if else elif')
 while_, for_ = G.Terminals('while for')
 
 inherits, function, protocol, extends, type_, base_ = G.Terminals('inherits function protocol extends type base')
+
 
 #productions
 
@@ -284,8 +286,5 @@ ob_params_ann %= id_ + colon + type_ann, lambda h,s: (s[1],s[3])
 
 vector_innit %= ocor + opt_arg_lis + ccor, lambda h,s: nodes.VectorInitializationNode(s[2])
 vector_innit %= ocor + expr + d_bar + id_ + in_ + expr + ccor, lambda h,s: nodes.VectorComprehensionNode(s[2],s[4],s[6])
-
-from cmp.tools.parsing import LR1Parser
-parser = LR1Parser(G)
 
 
