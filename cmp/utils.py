@@ -115,10 +115,10 @@ class Token:
         Token's type.
     """
 
-    def __init__(self, lex, token_type, col=0, row=0):
+    def __init__(self, lex, token_type, column=0, row=0):
         self.lex = lex
         self.token_type = token_type
-        self.col = col
+        self.column = column
         self.row = row
 
     def __str__(self):

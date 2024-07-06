@@ -52,23 +52,23 @@ class Lexer:
     def tokenize(self, text):
         rows = text.split('\n')
         row = 0
-        col = 1
+        column = 1
         while text:
             
             final_state, lex = self.evaluate(text)
             if len(lex) == 0: 
-                return LexerError("Error found with token's lex", col=col, row=row)
+                return LexerError("Error found with token's lex", column=column, row=row)
 
             _, token_type = [state.tag for state in final_state.state if state.tag][0]
             
             text = text[len(lex):]
         
-            yield Token(lex=lex, token_type=token_type, col=col, row=row)
+            yield Token(lex=lex, token_type=token_type, column=column, row=row)
 
-            col += len(lex)
-            if col > len(rows[row])+1: 
+            column += len(lex)
+            if column > len(rows[row])+1: 
                 row += 1
-                col = 0
+                column = 0
 
         
-        yield Token("$", self.eof, col=col, row=row)
+        yield Token("$", self.eof, column=column, row=row)
