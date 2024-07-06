@@ -1,83 +1,74 @@
 from Lexer.Lexer_generator import Lexer
-import Grammar
+import Grammar as Gr
 
 tokens = [
-    (Grammar.obra, '\{'),
-    (Grammar.cbra, '\}'),
-    (Grammar.opar, '\('),
-    (Grammar.cpar, '\)'),
-    (Grammar.ocor, '\['),
-    (Grammar.ccor, '\]'),
-    (Grammar.d_bar, '\|\|'),
+    (Gr.obra, '\{'),
+    (Gr.cbra, '\}'),
+    (Gr.opar, '\('),
+    (Gr.cpar, '\)'),
+    (Gr.ocor, '\['),
+    (Gr.ccor, '\]'),
+    (Gr.d_bar, '\|\|'),
     
-    (Grammar.dot, '\.'),
-    (Grammar.semi, ','),
-    (Grammar.colon, ':'),
-    (Grammar.semicolon, ';'),
-    (Grammar.arrow, '=>'),
+    (Gr.dot, '\.'),
+    (Gr.semi, ','),
+    (Gr.colon, ':'),
+    (Gr.semicolon, ';'),
+    (Gr.arrow, '=>'),
     
-    (Grammar.or_, '\|'),
-    (Grammar.and_, '&'),
-    (Grammar.not_, '!'),
+    (Gr.or_, '\|'),
+    (Gr.and_, '&'),
+    (Gr.not_, '!'),
     
-    (Grammar.d_as, ':='),
-    (Grammar.s_as, '='),
-    (Grammar.new_, 'new'),
+    (Gr.d_as, ':='),
+    (Gr.s_as, '='),
+    (Gr.new_, 'new'),
     
-    (Grammar.eq, '=='),
-    (Grammar.neq, '!='),
-    (Grammar.leq, '<='),
-    (Grammar.geq, '>='),
-    (Grammar.lt, '<'),
-    (Grammar.gt, '>'),
+    (Gr.eq, '=='),
+    (Gr.neq, '!='),
+    (Gr.leq, '<='),
+    (Gr.geq, '>='),
+    (Gr.lt, '<'),
+    (Gr.gt, '>'),
     
-    (Grammar.is_, 'is'),
-    (Grammar.as_, 'as'),
+    (Gr.is_, 'is'),
+    (Gr.as_, 'as'),
     
-    (Grammar.arr, '@'),
-    (Grammar.d_arr, '@@'),
+    (Gr.arr, '@'),
+    (Gr.d_arr, '@@'),
     
-    (Grammar.plus, '\+'),
-    (Grammar.minus, '\-'),
-    (Grammar.star, '\*'),
-    (Grammar.div, '/'),
-    (Grammar.mod, '%'),
-    (Grammar.pow_, '\^'),
-    (Grammar.pow__, '\*\*'),
+    (Gr.plus, '\+'),
+    (Gr.minus, '\-'),
+    (Gr.star, '\*'),
+    (Gr.div, '/'),
+    (Gr.mod, '%'),
+    (Gr.pow_, '\^'),
+    (Gr.pow__, '\*\*'),
     
-    (Grammar.bool_, 'true|false'),
-    (Grammar.str_, '"([\x00-!#-\x7f]|\\\\")*"'),
-    (Grammar.number_, '(0|[1-9][0-9]*)(.[0-9]+)?'),
+    (Gr.bool_, 'true|false'),
+    (Gr.str_, '"([\x00-!#-\x7f]|\\\\")*"'),
+    (Gr.number_, '(0|[1-9][0-9]*)(.[0-9]+)?'),
     
-    (Grammar.let_, 'let'),
-    (Grammar.in_, 'in'),
+    (Gr.let_, 'let'),
+    (Gr.in_, 'in'),
     
-    (Grammar.if_, 'if'),
-    (Grammar.else_, 'else'),
-    (Grammar.elif_, 'elif'),
+    (Gr.if_, 'if'),
+    (Gr.else_, 'else'),
+    (Gr.elif_, 'elif'),
     
-    (Grammar.while_, 'while'),
-    (Grammar.for_, 'for'),
+    (Gr.while_, 'while'),
+    (Gr.for_, 'for'),
     
-    (Grammar.inherits, 'inherits'),
-    (Grammar.function, 'function'),
-    (Grammar.protocol, 'protocol'),
-    (Grammar.extends, 'extends'),
-    (Grammar.type_, 'type'),
-    (Grammar.base_, 'base'),
+    (Gr.inherits, 'inherits'),
+    (Gr.function, 'function'),
+    (Gr.protocol, 'protocol'),
+    (Gr.extends, 'extends'),
+    (Gr.type_, 'type'),
+    (Gr.base_, 'base'),
 
-    (Grammar.id_, '[_a-zA-Z][_a-zA-Z0-9]*'),
+    (Gr.id_, '[_a-zA-Z][_a-zA-Z0-9]*'),
 ]
-text = """type person() {
-                            name = "John";
-                            age = 25;
-                            
-                           printName(){
-                                print(name);
-                            }
-                        }
-                        
-                        let x = new Person() in if (x.name == "Jane") print("Jane") else print("John");"""
+text = "let x = [1,2,3] in x[7] := 4;"
 
 lexer = Lexer(tokens,"$")
 print(lexer.tokenize(text))
