@@ -1,8 +1,8 @@
-from type_collector import TypeCollector
-from type_builder import TypeBuilder
-from type_cheker_vars import VarCollector
-from type_infererer import TypeInferrer
-from type_cheker import TypeChecker
+from Semantic.type_collector import TypeCollector
+from Semantic.type_builder import TypeBuilder
+from Semantic.type_cheker_vars import VarCollector
+from Semantic.type_infererer import TypeInferrer
+from Semantic.type_cheker import TypeChecker
 
 
 

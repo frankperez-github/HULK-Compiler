@@ -1,5 +1,5 @@
 from errors import HulkSemanticError
-from types_ import Type, Protocol, AutoType, ErrorType, VectorType
+from Semantic.types_ import Type, Protocol, AutoType, ErrorType, VectorType
 import Grammar.AST_nodes
 import itertools as itt
 

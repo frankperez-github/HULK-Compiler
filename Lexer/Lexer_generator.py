@@ -63,7 +63,7 @@ class Lexer:
             
             final_state, lex = self.evaluate(text)
             if len(lex) == 0: 
-                return LexerError("Error found with token's lex", column=column, row=row)
+                raise LexerError("Error found with token's lex", column=column, row=row)
 
             _, token_type = [state.tag for state in final_state.state if state.tag][0]
             

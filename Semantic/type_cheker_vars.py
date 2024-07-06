@@ -1,8 +1,8 @@
 import Grammar.AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
-from utils import Context, Scope, Function, VariableInfo
-from types_ import ErrorType, AutoType, Method, SelfType
+from Semantic.utils import Context, Scope, Function, VariableInfo
+from Semantic.types_ import ErrorType, AutoType, Method, SelfType
 
 
 class VarCollector(object):

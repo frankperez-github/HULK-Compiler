@@ -1,8 +1,8 @@
 import Grammar.AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
-from utils import Context
-from types_ import ErrorType, AutoType
+from Semantic.utils import Context
+from Semantic.types_ import ErrorType, AutoType
 
 class TypeBuilder(object):
     def __init__(self, context, errors=None) -> None:

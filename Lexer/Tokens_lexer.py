@@ -1,5 +1,5 @@
 
-import Grammar as Gr
+import Grammar.Grammar as Gr
 
 tokens = [
     (Gr.obra, '\{'),
