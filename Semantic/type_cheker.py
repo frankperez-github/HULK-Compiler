@@ -87,7 +87,7 @@ class TypeChecker(object):
 
         return_type = self.current_method.return_type
 
-        # Check if override is correct
+        # Comprobar si la sobreescritura es correcta
         if self.current_type.parent is None or self.current_type.parent.is_error():
             return return_type
 
@@ -522,7 +522,7 @@ class TypeChecker(object):
         ttype = self.visit(node.iterable)
         iterable_protocol = self.context.get_protocol('Iterable')
 
-        return_type = self.visit(node.selector)
+        return_type = self.visit(node.function)
 
         if not ttype.conforms_to(iterable_protocol):
             error_text = HulkSemanticError.INCOMPATIBLE_TYPES % (ttype.name, iterable_protocol.name)

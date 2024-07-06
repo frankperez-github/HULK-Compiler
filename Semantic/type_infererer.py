@@ -18,11 +18,10 @@ class TypeInferrer(object):
 
     def assign_auto_type(self, node:nodes.Node, scope: Scope, inf_type: Type | Protocol):
         """
-        Add the inferred type to the variable in the scope
-        :param node: The node that was inferred
-        :param scope: The scope where the variable is
-        :param inf_type: The inferred type
-        :rtype: None
+        Agrega el tipo inferido a una variable en el scope
+        :param node: El nodo que fue inferido
+        :param scope: Scope de la variable
+        :param inf_type: Tipo inferido
         """
         if isinstance(node, nodes.VariableNode) and scope.is_defined(node.lex):
             var_info = scope.find_variable(node.lex)
@@ -77,12 +76,12 @@ class TypeInferrer(object):
         for attr in node.attributes:
             self.visit(attr)
 
-        # Check if we could infer some params types
+        # Comprobar si podemos inferir el tipo de algunos parametros
         for i, param_type in enumerate(self.current_type.params_types):
             param_name = self.current_type.params_names[i]
             local_var = const_scope.find_variable(param_name)
             local_var.type = param_type
-            # Check if we could infer the param type in the body
+            # Comprobar si podemos inferir el tipo del parametro en el cuerpo
             if isinstance(param_type, AutoType) and local_var.is_parameter and local_var.inferred_types:
                 try:
                     new_type = get_most_specialized_type(local_var.inferred_types, var_name=param_name)
@@ -93,7 +92,7 @@ class TypeInferrer(object):
                 if not isinstance(new_type, AutoType):
                     self.had_changed = True
                 local_var.set_type_and_clear_inference_types_list(new_type)
-            # Check if we could infer the param type in a call
+            # Comprobar si podemos inferir el tipo del parametro por algun llamado
             if (isinstance(self.current_type.params_types[i], AutoType)
                     and self.current_type.param_vars[i].inferred_types):
                 new_type = get_lowest_common_ancestor(self.current_type.param_vars[i].inferred_types)
@@ -102,7 +101,7 @@ class TypeInferrer(object):
                     self.had_changed = True
                 local_var.set_type_and_clear_inference_types_list(new_type)
 
-            # Infer the params types and return type of the methods
+            # Inferir el tipo de retorno y el tipo de los parametros de los metodos
         for method in node.methods:
             self.visit(method)
 
@@ -137,12 +136,12 @@ class TypeInferrer(object):
 
         expr_scope = node.expr.scope
 
-        # Check if we could infer some params types
+        # Comprobar si podemos inferir el tipo de algunos parametros
         for i, param_type in enumerate(function.param_types):
             param_name = function.param_names[i]
             local_var = expr_scope.find_variable(param_name)
             local_var.type = param_type
-            # Check if we could infer the param type in the body
+            # Comprobar si podemos inferir el tipo del parametro en el cuerpo
             if isinstance(param_type, AutoType) and local_var.is_parameter and local_var.inferred_types:
                 try:
                     new_type = get_most_specialized_type(local_var.inferred_types, var_name=param_name)
@@ -153,7 +152,7 @@ class TypeInferrer(object):
                 if not isinstance(new_type, AutoType):
                     self.had_changed = True
                 local_var.set_type_and_clear_inference_types_list(new_type)
-            # Check if we could infer the param type in a call
+            # Comprobar si podemos inferir el tipo del parametro por algun llamado
             if isinstance(function.param_types[i], AutoType) and function.param_vars[i].inferred_types:
                 new_type = get_lowest_common_ancestor(function.param_vars[i].inferred_types)
                 function.param_types[i] = new_type
@@ -177,12 +176,12 @@ class TypeInferrer(object):
             self.had_changed = True
             self.current_method.return_type = return_type
 
-        # Check if we could infer some params types
+        # Comprobar si podemos inferir el tipo de algunos parametros
         for i, param_type in enumerate(self.current_method.param_types):
             param_name = self.current_method.param_names[i]
             local_var = method_scope.find_variable(param_name)
             local_var.type = param_type
-            # Check if we could infer the param type in the body
+            # Comprobar si podemos inferir el tipo del parametro en el cuerpo
             if isinstance(param_type,AutoType) and local_var.is_parameter and local_var.inferred_types:
                 try:
                     new_type = get_most_specialized_type(local_var.inferred_types, var_name=param_name)
@@ -193,7 +192,7 @@ class TypeInferrer(object):
                 if not isinstance(new_type, AutoType):
                     self.had_changed = True
                 local_var.set_type_and_clear_inference_types_list(new_type)
-            # Check if we could infer the param type in a call
+            # Comprobar si podemos inferir el tipo del parametro por algun llamado
             if (isinstance(self.current_method.param_types[i],AutoType)
                     and self.current_method.param_vars[i].inferred_types):
                 new_type = get_lowest_common_ancestor(self.current_method.param_vars[i].inferred_types)
@@ -267,7 +266,7 @@ class TypeInferrer(object):
         expr_scope = node.expression.scope
         variable = expr_scope.find_variable(node.var)
 
-        # Check if we could infer the type of the iterable
+        # Comprobar si podemos inferir el tipo del iterable
         if ttype.is_error():
             variable.type = ErrorType()
         elif ttype == AutoType():
@@ -602,7 +601,7 @@ class TypeInferrer(object):
         ttype = self.visit(node.iterable)
         iterable_protocol = self.context.get_protocol('Iterable')
 
-        selector_scope = node.selector.scope
+        selector_scope = node.function.scope
 
         variable = selector_scope.find_variable(node.var)
 
@@ -616,7 +615,7 @@ class TypeInferrer(object):
         else:
             variable.type =ErrorType()
 
-        return_type = self.visit(node.selector)
+        return_type = self.visit(node.function)
 
         if return_type.is_error():
             return ErrorType()

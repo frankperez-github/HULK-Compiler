@@ -40,18 +40,17 @@ class VarCollector(object):
         if self.current_type.is_error():
             return
 
-        # Set parent arguments when they are None
+        
         if node.parent_args is None:
             node.parent_args = []
 
-        # Set params cause in the type builder I didn't have the params of my parent
+        # Agregamos los parametros dado que el el tipe builder no podemos obtener los parametros del padre
         if node.parent_args == [] and node.params_ids == []:
             self.current_type.set_params()
             node.params_ids, node.params_types = self.current_type.params_names, self.current_type.params_types
-            # After this I know that my parent's args are my params (are just variables with its params names)
             node.parent_args = [nodes.VariableNode(param_name) for param_name in self.current_type.params_names]
 
-        # Create a new scope that includes the parameters
+        # Se crea un scope que incluya los parametros
         new_scope = scope.create_child()
 
         for i, param_name in enumerate(self.current_type.params_names):
@@ -65,7 +64,7 @@ class VarCollector(object):
         for attr in node.attributes:
             self.visit(attr, new_scope.create_child())
 
-        # Create a new scope that includes the self symbol
+        # Se crea un scope que incluya el simbolo Self
         methods_scope = scope.create_child()
         methods_scope.define_variable('self', SelfType(self.current_type))
         for method in node.methods:
@@ -116,11 +115,11 @@ class VarCollector(object):
 
     @visitor.when(nodes.VarDeclarationNode)
     def visit(self, node: nodes.VarDeclarationNode, scope: Scope):
-        # I don't want to include the var before to avoid let a = a in print(a);
+        # Incluimos la variable en el scope al final para evitar instrucciones como: let a = a in print(a);
         self.visit(node.expr, scope.create_child())
         node.scope = scope.create_child()
 
-        # Check if the variable type is a defined type, an error type or auto_type (we need to infer it)
+        # Comprobar si el tipo de la variable esta definido, si es un error o si necesitamos inferirlo
         if node.var_type is not None:
             try:
                 var_type = self.context.get_type_or_protocol(node.var_type)
@@ -135,7 +134,7 @@ class VarCollector(object):
     @visitor.when(nodes.LetInNode)
     def visit(self, node: nodes.LetInNode, scope: Scope):
         node.scope = scope
-        # Create a new scope for every new variable declaration to follow scoping rules
+        # Se crea un scope con cada declaracion de variable
         old_scope = scope
         for declaration in node.var_declarations:
             self.visit(declaration, old_scope)
@@ -239,7 +238,7 @@ class VarCollector(object):
 
         selector_scope = scope.create_child()
         selector_scope.define_variable(node.var, AutoType(), is_parameter=True)
-        self.visit(node.selector, selector_scope)
+        self.visit(node.function, selector_scope)
 
         self.visit(node.iterable, scope.create_child())
 

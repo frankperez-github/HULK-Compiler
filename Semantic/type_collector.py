@@ -16,10 +16,10 @@ class TypeCollector(object):
 
     @visitor.when(nodes.ProgramNode)
     def visit(self, node:nodes.ProgramNode):
-        # Create the global context
+        # Creando el contexto global
         self.context = Context()
 
-        # Add the basic types
+        # Agregando los tipos basicos
         object_type = self.context.create_type('Object')
 
         number_type = self.context.create_type('Number')
@@ -37,7 +37,7 @@ class TypeCollector(object):
         object_type.define_method('equals', ['other'], [object_type], bool_type)
         object_type.define_method('toString', [], [], string_type)
 
-        # Add the built-in functions
+        # Agregando las funciones predefinidas
         self.context.create_function('print', ['value'], [object_type], string_type)
         self.context.create_function('sqrt', ['value'], [number_type], number_type)
         self.context.create_function('sin', ['angle'], [number_type], number_type)
@@ -47,7 +47,7 @@ class TypeCollector(object):
         self.context.create_function('rand', [], [], number_type)
         self.context.create_function('parse', ['value'], [string_type], number_type)
 
-        # Add iterable protocol
+        # Agregando el protocolo Iterable
         iterable_protocol = self.context.create_protocol('Iterable')
         iterable_protocol.define_method('next', [], [], bool_type)
         iterable_protocol.define_method('current', [], [], object_type)
@@ -70,6 +70,7 @@ class TypeCollector(object):
     @visitor.when(nodes.TypeDeclarationNode)
     def visit(self, node:nodes.TypeDeclarationNode):
         try:
+            # Agregando los tipos declarados en el programa
             self.context.create_type(node.id, node)
         except HulkSemanticError as e:
             self.errors.append(e)
@@ -78,6 +79,7 @@ class TypeCollector(object):
     @visitor.when(nodes.ProtocolDeclarationNode)
     def visit(self, node: nodes.ProtocolDeclarationNode):
         try:
+            #Agregando los protocolos declarados en el programa
             self.context.create_protocol(node.id, node)
         except HulkSemanticError as e:
             self.errors.append(e)

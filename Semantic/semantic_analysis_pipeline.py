@@ -46,11 +46,10 @@ def semantic_analysis_pipeline(ast, debug=False):
         print('---------------- INFERRING TYPES ------------------')
     type_inferrer = TypeInferrer(context, errors)
     type_inferrer.visit(ast)
-    # Check if there are any inference errors and change the types to ErrorType if there are
+    # Comprobar si hay errores de inferencia y cambiar su tipo a Error
     inference_errors = context.inference_errors() + scope.inference_errors()
     errors.extend(inference_errors)
     if debug:
-        #print('Iterations: ' + str(type_inferrer.current_iteration))
         print('Errors: [')
         for error in errors:
             print('\t', error)

@@ -29,7 +29,7 @@ class TypeBuilder(object):
             return_type = AutoType()
         else:
             try:
-                # Check if the return type is declared
+                # Comprobando si el tipo de retorno esta declarado
                 return_type = self.context.get_type_or_protocol(node.return_type)
             except HulkSemanticError as e:
                 self.errors.append(e)
@@ -40,8 +40,8 @@ class TypeBuilder(object):
         except HulkSemanticError as e:
             self.errors.append(e)
 
+        # Para los tipos que no especifican sus parametros
     def get_params_names_and_types(self, node):
-        # For types that don't specify params
         if node.params_ids is None or node.params_types is None:
            return [], []
 
@@ -50,7 +50,7 @@ class TypeBuilder(object):
 
         for i, param_name in enumerate(node.params_ids):
             param_type = node.params_types[i]
-            # Check if the parameter is already declared and set it to ErrorType
+            # Comprobando si el parametro ya esta deeclarado
             if param_name in params_names:
                 self.errors.append(HulkSemanticError(f'Parameter {param_name} is already declared'))
                 index = params_names.index(param_name)
@@ -78,12 +78,12 @@ class TypeBuilder(object):
 
         self.current_type.params_names, self.current_type.params_types = self.get_params_names_and_types(node)
 
-        # Check if the type is inheriting from a forbidden type
+        # Comprobando que el tipo no herede de un tipo incorrecto
         if node.parent in ['Number', 'Boolean', 'String']:
             self.errors.append(HulkSemanticError(f'Type {node.id} is inheriting from a forbidden type  -_-'))
         elif node.parent is not None:
             try:
-                # Look for a circular dependency
+                # Comprobando que no exista dependencia circular
                 parent = self.context.get_type(node.parent)
                 current = parent
                 while current is not None:
@@ -93,13 +93,14 @@ class TypeBuilder(object):
                         break
                     current = current.parent
             except HulkSemanticError as e:
-                # If the parent type is not declared, set it to ErrorType
+                # Si el tipo del padre no esta declarado, marcar el tipo como Error
                 self.errors.append(e)
                 parent = ErrorType()
             try:
+                # Se intenta asignar el padre al tipo
                 self.current_type.set_parent(parent)
             except HulkSemanticError as e:
-                # If the parent type is already set
+                # Si el tipo ya tiene un padre definido se almacena un error
                 self.errors.append(e)
         else:
             object_type = self.context.get_type('Object')
@@ -120,7 +121,7 @@ class TypeBuilder(object):
             return_type = AutoType()
         else:
             try:
-                # Check if the return type is declared
+                # Comprobando si el tipo de retorno esta declarado
                 return_type = self.context.get_type_or_protocol(node.return_type)
             except HulkSemanticError as e:
                 self.errors.append(e)
@@ -134,8 +135,8 @@ class TypeBuilder(object):
 
     @visitor.when(nodes.AttributeDeclarationNode)
     def visit(self, node: nodes.AttributeDeclarationNode):
-        # Set the attribute type to the declared type, ErrorType if it doesn't exist in the context or AutoType if we
-        # are going to infer it
+        # Se le agrega al atributo el tipo declarado, ErrorType si este no existe o
+        # AutoType si necesitamos inferirlo
         if node.attribute_type is not None:
             try:
                 attribute_type = self.context.get_type_or_protocol(node.attribute_type)
@@ -159,7 +160,7 @@ class TypeBuilder(object):
 
         if node.parent is not None:
             try:
-                # Look for a circular dependency
+                 # Comprobando que no exista dependencia circular
                 parent = self.context.get_protocol(node.parent)
                 current = parent
                 while current is not None:
@@ -169,13 +170,14 @@ class TypeBuilder(object):
                         break
                     current = current.parent
             except HulkSemanticError as e:
-                # If the parent type is not declared, set it to ErrorType
+                # Si el tipo del padre no esta declarado, marcar el protocolo como Error
                 self.errors.append(e)
                 parent = ErrorType()
             try:
+                # Se intenta asignar el padre al protocolo
                 self.current_type.set_parent(parent)
             except HulkSemanticError as e:
-                # If the parent type is already set
+                # Si el protocolo ya tiene un padre definido se almacena un error
                 self.errors.append(e)
 
         for method in node.methods_signature:
@@ -186,7 +188,7 @@ class TypeBuilder(object):
         params_names, params_types = self.get_params_names_and_types(node)
 
         try:
-            # Check if the return type is declared
+            # Comprobando si el tipo de retorno esta declarado
             return_type = self.context.get_type_or_protocol(node.return_type)
         except HulkSemanticError as e:
             self.errors.append(e)
