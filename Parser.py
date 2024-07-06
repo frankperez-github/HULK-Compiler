@@ -119,7 +119,6 @@ class ShiftReduceParser:
     def _build_parsing_table(self):
         raise NotImplementedError()
 
-    
 
     def __call__(self, w):
         stack = [ 0 ]
@@ -142,17 +141,14 @@ class ShiftReduceParser:
                     
                     #Shift case
                     case self.SHIFT:
-                        #stack.append(lookahead)
                         stack.append(tag)
                         cursor += 1
                     #Reduce case
                     case self.REDUCE: 
-                        #production = self.G.Productions[tag]
                         left, right = tag
                         for ele in right:
                             if not ele.IsEpsilon:
                                     stack.pop()
-                            #stack.pop()
                         l = stack[-1]              
                         stack.append(self.goto[(l, left)])
                         output.append(tag)
