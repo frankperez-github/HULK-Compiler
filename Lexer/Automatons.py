@@ -1,7 +1,7 @@
 from cmp.utils import ContainerSet, DisjointSet
 
 
-class NFA:
+class NDFA:
     def __init__(self, states: int, finals: list[int], transitions: dict[(int,str),list[int]], start: int = 0):
         self.states = states
         self.start = start
@@ -120,7 +120,7 @@ class NFA:
         states = a1.states + a2.states + 2
         finals = { final }
     
-        return NFA(states, finals, transitions, start)
+        return NDFA(states, finals, transitions, start)
     
     def concatenation(a1, a2):
         transitions = {}
@@ -151,7 +151,7 @@ class NFA:
         states = a1.states + a2.states + 1
         finals = { final }
         
-        return NFA(states, finals, transitions, start)
+        return NDFA(states, finals, transitions, start)
     
 
     def closure(a1):
@@ -175,11 +175,11 @@ class NFA:
         states = a1.states +  2
         finals = { final }
         
-        return NFA(states, finals, transitions, start)
+        return NDFA(states, finals, transitions, start)
     
 
-class DFA(NFA):    
+class DFA(NDFA):    
     def __init__(self, states: int, finals: list[int], transitions: dict[(int,str):int], start: int = 0):
         transitions = { key: [value] for key, value in transitions.items() }
-        NFA.__init__(self, states, finals, transitions, start)
+        NDFA.__init__(self, states, finals, transitions, start)
         self.current = start

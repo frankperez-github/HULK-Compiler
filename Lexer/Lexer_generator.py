@@ -61,7 +61,7 @@ class Lexer:
             
             text = text[len(lex):]
         
-            yield lex, token_type, col, row
+            yield Token(lex=lex, token_type=token_type, col=col, row=row)
 
             col += len(lex)
             if col > len(rows[row])+1: 

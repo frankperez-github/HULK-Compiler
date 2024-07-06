@@ -8,37 +8,37 @@ from cmp.evaluation import evaluate_reverse_parse
 
 class Epsilon(AtomicNode):
     def evaluate(self):
-        return NFA(states=1, finals=[0], transitions={})
+        return NDFA(states=1, finals=[0], transitions={})
     
 class Symbol(AtomicNode):
     def evaluate(self):
         s = self.lex
-        return NFA(states=2, finals=[1], transitions={(0, s): [1]})    
+        return NDFA(states=2, finals=[1], transitions={(0, s): [1]})    
     
 class Union(BinaryNode):
     @staticmethod
     def operate(lvalue, rvalue):        
-        return NFA.union(lvalue,rvalue)
+        return NDFA.union(lvalue,rvalue)
 
 class Concatenation(BinaryNode):
     @staticmethod
     def operate(lvalue, rvalue):        
-        return NFA.concatenation(lvalue,rvalue)
+        return NDFA.concatenation(lvalue,rvalue)
     
 class Closure(UnaryNode):
     @staticmethod
-    def operate(value: NFA):        
+    def operate(value: NDFA):        
         return value.closure()
 
 class PositiveClosure(UnaryNode):
     @staticmethod
-    def operate(value: NFA):        
-        return NFA.concatenation(value,value.closure())
+    def operate(value: NDFA):        
+        return NDFA.concatenation(value,value.closure())
     
 class Zero_One(UnaryNode):
     @staticmethod
-    def operate(value: NFA):        
-        return NFA.union(value,Epsilon(G.EOF).evaluate())
+    def operate(value: NDFA):        
+        return NDFA.union(value,Epsilon(G.EOF).evaluate())
     
 class Char(Node):
     def __init__(self, symbols: list[Symbol]) -> None:
@@ -156,6 +156,6 @@ class Regex:
             raise TypeError
 
         ast = evaluate_reverse_parse(parse,operations,tokens)
-        nfa = ast.evaluate()
-        dfa = nfa.to_DFA()
+        ndfa = ast.evaluate()
+        dfa = ndfa.to_DFA()
         return dfa
