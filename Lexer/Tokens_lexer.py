@@ -1,4 +1,4 @@
-from Lexer.Lexer_generator import Lexer
+
 import Grammar as Gr
 
 tokens = [
@@ -68,7 +68,3 @@ tokens = [
 
     (Gr.id_, '[_a-zA-Z][_a-zA-Z0-9]*'),
 ]
-text = "let x = [1,2,3] in x[7] := 4;"
-
-lexer = Lexer(tokens,"$")
-print(lexer.tokenize(text))

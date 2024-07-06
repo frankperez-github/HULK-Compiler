@@ -1,6 +1,7 @@
 from code_visitor import CodeGenC
 
 
+
 class CCodeGenerator:
     def __call__(self, ast, context):
         with open('c_base.c') as c_tools:

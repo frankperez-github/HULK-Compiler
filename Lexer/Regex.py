@@ -2,7 +2,7 @@ from Lexer.Automatons import *
 from cmp.ast import *
 from cmp.pycompiler import Grammar
 from cmp.utils import Token
-from Parser import LR1Parser
+from Parser.Parser import LR1Parser
 from cmp.evaluation import evaluate_reverse_parse
 
 

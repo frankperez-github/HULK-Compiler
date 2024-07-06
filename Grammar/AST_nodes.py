@@ -1,6 +1,5 @@
 from abc import ABC
-#from cmp.semantic import Scope
-from cmp.semantic import Scope
+from Semantic.utils import Scope
 
 class Node(ABC):
     def __init__(self):

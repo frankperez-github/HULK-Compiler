@@ -1,9 +1,9 @@
-import AST_nodes as nodes
+import Grammar.AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
-from utils import Context, Scope, Function, VariableInfo
-from types_ import ErrorType, AutoType, Method, SelfType, Type, Protocol, VectorType
-from types_ import get_lowest_common_ancestor, get_most_specialized_type
+from utils import Context, Function
+from types_ import ErrorType,SelfType,VectorType
+from types_ import get_lowest_common_ancestor
 from types_ import BoolType, NumberType
 
 

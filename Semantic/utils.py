@@ -1,6 +1,6 @@
 from errors import HulkSemanticError
 from types_ import Type, Protocol, AutoType, ErrorType, VectorType
-import AST_nodes
+import Grammar.AST_nodes
 import itertools as itt
 
 class Function:
@@ -78,7 +78,7 @@ class Context:
             raise HulkSemanticError(f'Protocol "{ttype}" is not defined.')
 
     def get_type_or_protocol(self, ttype):
-        if isinstance(ttype, AST_nodes.VectorTypeAnnotationNode):
+        if isinstance(ttype, Grammar.AST_nodes.VectorTypeAnnotationNode):
             element_type = self.get_type_or_protocol(ttype.element_type)
             return VectorType(element_type)
         else:
