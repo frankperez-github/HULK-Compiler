@@ -43,7 +43,7 @@ class HulkSyntacticError(HulkError):
         self.column = column
 
     def __str__(self):
-        return f'({self.line}, {self.column}) - {self.error_type}: {self.text}'
+        return f'{self.error_type} at line {self.line} , column  {self.column}: {self.text}'
 
     PARSING_ERROR = 'Error at or near \'%s\'.'
 
