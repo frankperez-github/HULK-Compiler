@@ -1,6 +1,7 @@
 from cmp.utils import Token
 from cmp.automata import State
 from Lexer.Regex import Regex
+from errors import *
 
 
 class Lexer:
@@ -55,7 +56,8 @@ class Lexer:
         while text:
             
             final_state, lex = self.evaluate(text)
-            assert len(lex) != 0, 'Error lex with len 0 detected'
+            if len(lex) == 0: 
+                return LexerError("Error found with token's lex", col=col, row=row)
 
             _, token_type = [state.tag for state in final_state.state if state.tag][0]
             

@@ -1,3 +1,12 @@
+class LexerError(Exception):
+    def __init__(self, error_message, col, row):
+        self.row = row
+        self.col = col
+        self.error_message = error_message
+
+    def __str__(self):
+        return f'Syntatic Error on line: {self.row}, col: {self.col}. Error message: {self.error_message}'
+
 class HulkError(Exception):
     def __init__(self, text):
         super().__init__(text)
@@ -25,23 +34,6 @@ class HulkIOError(HulkError):
     @property
     def error_type(self):
         return 'IOHulkError'
-
-
-class HulkLexicographicError(HulkError):
-    def __init__(self, text, line, column):
-        super().__init__(text)
-        self.line = line
-        self.column = column
-
-    def __str__(self):
-        return f'({self.line}, {self.column}) - {self.error_type}: {self.text}'
-
-    UNKNOWN_TOKEN = 'Unknown token \'%s\'.'
-    UNTERMINATED_STRING = 'Unterminated string \'%s\'.'
-
-    @property
-    def error_type(self):
-        return 'LexicographicError'
 
 
 class HulkSyntacticError(HulkError):
