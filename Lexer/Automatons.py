@@ -16,6 +16,23 @@ class NDFA:
             
         self.vocabulary.discard('')
         
+    def export_to_mermaid(self, filename):
+        mermaid = ["```mermaid", "stateDiagram-v2"]
+
+        for (origin, symbol), destinations in self.map.items():
+            for dest in destinations:
+                transition = f"    {origin} --> {dest} : {symbol}"
+                mermaid.append(transition)
+        
+        for final in self.finals:
+            final_state = f"    state {final} as **{final}**"
+            mermaid.append(final_state)
+        
+        mermaid.append("```")
+        mermaid_str = "\n".join(mermaid)
+
+        with open(filename, 'w') as file:
+            file.write(mermaid_str)
 
     def to_DFA(self):
         transitions = {}
@@ -95,17 +112,13 @@ class NDFA:
         final = a2.states + d_2
     
         for (origin, symbol), destinations in a1.map.items():
-            ## Relocate a1 transitions ...
             transitions[d_1 + origin, symbol] = [d_1 + d for d in destinations]
 
         for (origin, symbol), destinations in a2.map.items():
-            ## Relocate a2 transitions ...
             transitions[d_2 + origin, symbol] = [d_2 + d for d in destinations]
     
-        ## Add transitions from start state ...
         transitions[start, ''] = [a1.start + d_1, a2.start + d_2]
     
-        ## Add transitions to final state ...
         for i in a1.finals:
             try:
                 transitions[i + d_1, ''].add(final)
