@@ -7,6 +7,8 @@ from errors import *
 class Lexer:
     def __init__(self, table, eof):
         self.eof = eof
+        table.append(('space', '  *'))
+        table.append(('endofline','\n'))
         self.regexs = self.make_regex_automatons(table)
         self.automaton = self.make_automaton()
 
@@ -67,7 +69,7 @@ class Lexer:
             
             text = text[len(lex):]
 
-            if len(lex.split(' ')) == 1:
+            if token_type != 'space' and token_type != 'endofline':
                 yield Token(lex=lex, token_type=token_type, column=column, row=row)
 
             column += len(lex)
