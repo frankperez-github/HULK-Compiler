@@ -71,4 +71,4 @@ class Lexer:
                 col = 0
 
         
-        yield '$', self.eof
+        yield Token("$", self.eof, col=col, row=row)
