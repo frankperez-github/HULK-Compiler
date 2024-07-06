@@ -62,8 +62,9 @@ class Lexer:
             _, token_type = [state.tag for state in final_state.state if state.tag][0]
             
             text = text[len(lex):]
-        
-            yield Token(lex=lex, token_type=token_type, column=column, row=row)
+
+            if len(lex.split(' ')) == 1:
+                yield Token(lex=lex, token_type=token_type, column=column, row=row)
 
             column += len(lex)
             if column > len(rows[row])+1: 
