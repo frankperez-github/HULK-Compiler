@@ -83,5 +83,4 @@ text = """type person() {
                         let x = new Person() in if (x.name == "Jane") print("Jane") else print("John");"""
 
 lexer = Lexer(tokens,"$")
-for token in lexer.tokenize(text):
-    print(token)
+print(lexer.tokenize(text))

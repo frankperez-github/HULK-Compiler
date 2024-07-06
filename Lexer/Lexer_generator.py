@@ -50,6 +50,10 @@ class Lexer:
     
     
     def tokenize(self, text):
+        return [token for token in self.tokens_generator(text)]
+
+
+    def tokens_generator(self, text):
         rows = text.split('\n')
         row = 0
         column = 1
@@ -72,4 +76,5 @@ class Lexer:
                 column = 0
 
         
-        yield Token("$", self.eof, column=column, row=row)
+        yield Token("$", self.eof, column=column, row=row)    
+    
