@@ -1,10 +1,10 @@
-from code_visitor import CodeGenC
+from Code_gen.code_visitor import CodeGenC
 
 
 
 class CCodeGenerator:
     def __call__(self, ast, context):
-        with open('c_base.c') as c_tools:
+        with open('Code_gen/c_base.c') as c_tools:
             return c_tools.read() + "\n\n" + self.generate(ast, context)
         
         

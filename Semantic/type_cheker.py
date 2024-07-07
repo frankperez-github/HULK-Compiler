@@ -1,10 +1,10 @@
 import Grammar.AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
-from utils import Context, Function
-from types_ import ErrorType,SelfType,VectorType
-from types_ import get_lowest_common_ancestor
-from types_ import BoolType, NumberType
+from Semantic.utils import Context, Function
+from Semantic.types_ import ErrorType,SelfType,VectorType
+from Semantic.types_ import get_lowest_common_ancestor
+from Semantic.types_ import BoolType, NumberType
 
 
 

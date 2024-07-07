@@ -1,7 +1,7 @@
 import Grammar.AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
-from utils import Context
+from Semantic.utils import Context
 
 class TypeCollector(object):
 

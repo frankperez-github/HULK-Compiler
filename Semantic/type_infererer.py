@@ -1,9 +1,9 @@
 import Grammar.AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
-from utils import Context, Scope, Function
-from types_ import ErrorType, AutoType, SelfType, Type, Protocol, VectorType
-from types_ import get_lowest_common_ancestor, get_most_specialized_type
+from Semantic.utils import Context, Scope, Function
+from Semantic.types_ import ErrorType, AutoType, SelfType, Type, Protocol, VectorType
+from Semantic.types_ import get_lowest_common_ancestor, get_most_specialized_type
 
 
 class TypeInferrer(object):

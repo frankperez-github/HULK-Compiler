@@ -1,5 +1,5 @@
 from cmp.pycompiler import Grammar
-import AST_nodes as nodes
+import Grammar.AST_nodes as nodes
 
 G = Grammar()
 
