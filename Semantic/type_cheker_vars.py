@@ -2,7 +2,7 @@ import Grammar.AST_nodes as nodes
 import cmp.visitor as visitor
 from errors import HulkSemanticError
 from Semantic.utils import Context, Scope, Function, VariableInfo
-from Semantic.types_ import ErrorType, AutoType, Method, SelfType
+from Semantic.types_ import ErrorType, AutoType, Method, SelfType, NumberType
 
 
 class VarCollector(object):
@@ -21,6 +21,10 @@ class VarCollector(object):
     @visitor.when(nodes.ProgramNode)
     def visit(self, node:nodes.ProgramNode, scope: Scope = None):
         scope = Scope()
+        scope.define_variable("PI",NumberType())
+        scope.find_variable("PI").setNameC("PI")
+        scope.define_variable("E",NumberType())
+        scope.find_variable("E").setNameC("E")
         node.scope = scope
 
         for declaration in node.declarations:
