@@ -38,14 +38,7 @@ def run_pipeline(input_path: Path, output_path: Path):
     except errors.LexerError as e:
         print_error(e)
         return
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> b65e6e7ab1542a9ea0ed8e7bf4ee873ef53acd11
->>>>>>> 261348243b4a14aa2b6c289576f4200e60035fe7
     parser = LR1Parser(G)
 
     try: 
@@ -53,11 +46,7 @@ def run_pipeline(input_path: Path, output_path: Path):
     except ParserError as e:
         error_token = tokens_[e.token_index]
         error_text = errors.HulkSyntacticError.PARSING_ERROR % error_token.lex
-<<<<<<< HEAD
-        error_ = [errors.HulkSyntacticError(error_text, error_token.column, error_token.row)]
-=======
         error_ = [errors.HulkSyntacticError(error_text, error_token.row, error_token.column,)]
->>>>>>> b65e6e7ab1542a9ea0ed8e7bf4ee873ef53acd11
         print_error(error_)
         return
     
@@ -81,15 +70,6 @@ def run_pipeline(input_path: Path, output_path: Path):
         print_error(error)
         return
     
-<<<<<<< HEAD
-
-
-if __name__ == "__main__":
-    inp = sys.argv[1]
-    input_path = Path(inp)
-    input_file_name = input_path.stem
-    output_file = Path(f'{input_file_name}.c')
-=======
     
     subprocess.run(["gcc","-o",input_name,input_name+'.c', "-lm"])
     subprocess.run(['./%s'%input_name])
@@ -101,7 +81,6 @@ if __name__ == "__main__":
     input_path = Path(input)
     input_name = input_path.stem
     output_file = Path(f'{input_name}.c')
->>>>>>> b65e6e7ab1542a9ea0ed8e7bf4ee873ef53acd11
     run_pipeline(input_path, output_file)
 
 
