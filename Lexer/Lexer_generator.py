@@ -65,8 +65,10 @@ class Lexer:
             if len(lex) == 0: 
                 raise LexerError("Error found with token's lex", column=column, row=row)
 
-            _, token_type = [state.tag for state in final_state.state if state.tag][0]
-            
+            priority_in_table = [state.tag for state in final_state.state if state.tag]
+            priority_in_table.sort()
+            _, token_type = priority_in_table[0]
+
             text = text[len(lex):]
 
             if token_type != 'space' and token_type != 'endofline':
