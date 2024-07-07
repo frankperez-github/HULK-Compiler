@@ -66,10 +66,16 @@ class CodeGenC(object):
     
     @staticmethod
     def set_pi_and_e(str_: str):
-        index_pi= str_.index("Object* PI")
-        str_=str_[:index_pi]+"createNumber(3.141592653589793)"+str_[index_pi+10:]
-        index_e= str_.index("Object* E")
-        str_=str_[:index_e]+"createNumber(2.718281828459045)"+str_[index_pi+9:]
+        try:
+            index_pi= str_.index("PI")
+            str_=str_[:index_pi]+"createNumber(3.141592653589793)"+str_[index_pi+2:]
+        except:
+            pass
+        try:
+            index_e= str_.index("E")
+            str_=str_[:index_e]+"createNumber(2.718281828459045)"+str_[index_e+1:]
+        except:
+            pass
         return str_
 
 
