@@ -70,13 +70,17 @@ def run_pipeline(input_path: Path, output_path: Path):
         print_error(error)
         return
     
+    
+    subprocess.run(["gcc","-o",input_name,input_name+'.c', "-lm"])
+    subprocess.run(['./%s'%input_name])
+    
 
 
 if __name__ == "__main__":
-    inp = sys.argv[1]
-    input_path = Path(inp)
-    input_file_name = input_path.stem
-    output_file = Path(f'{input_file_name}.c')
+    input = sys.argv[1]
+    input_path = Path(input)
+    input_name = input_path.stem
+    output_file = Path(f'{input_name}.c')
     run_pipeline(input_path, output_file)
 
 
