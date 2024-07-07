@@ -38,7 +38,7 @@ def run_pipeline(input_path: Path, output_path: Path):
     except errors.LexerError as e:
         print_error(e)
         return
-    
+
     parser = LR1Parser(G)
 
     try: 

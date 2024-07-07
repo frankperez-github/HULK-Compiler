@@ -63,6 +63,15 @@ class CodeGenC(object):
             conditions.extend(c)
             expressions.extend(e)
             return conditions,expressions
+    
+    @staticmethod
+    def set_pi_and_e(str_: str):
+        index_pi= str_.index("Object* PI")
+        str_=str_[:index_pi]+"createNumber(3.141592653589793)"+str_[index_pi+10:]
+        index_e= str_.index("Object* E")
+        str_=str_[:index_e]+"createNumber(2.718281828459045)"+str_[index_pi+9:]
+        return str_
+
 
 
     @visitor.on('node')
@@ -131,6 +140,7 @@ class CodeGenC(object):
         create_block += def_vars + "\n" + code + "\n}"
         self.create_blocks += create_block + "\n\n"
 
+        params= self.set_pi_and_e(params)
         return "createBlock" + str(index) + params
     
     
@@ -186,7 +196,7 @@ class CodeGenC(object):
 
 
         self.expression_block += code + "\n\n"
-
+        params= self.set_pi_and_e(params)
         return "expressionBlock" + str(index) + params
     
     
@@ -276,6 +286,8 @@ class CodeGenC(object):
 
         self.let_in_blocks += code + "\n\n"
 
+
+        params= self.set_pi_and_e(params)
         return "letInNode" + str(index) + params
     
     
@@ -372,6 +384,7 @@ class CodeGenC(object):
 
             self.method_call_blocks += code + "\n\n"
 
+            params= self.set_pi_and_e(params)
             return "methodCallBlock" + str(index) + params
         
         
@@ -422,6 +435,7 @@ class CodeGenC(object):
 
         self.if_else_blocks += code + "\n\n"
 
+        params= self.set_pi_and_e(params)
         return "ifElseBlock" + str(index) + params
     
     
@@ -483,6 +497,7 @@ class CodeGenC(object):
 
             self.method_call_blocks += code + "\n\n"
 
+            params= self.set_pi_and_e(params)
             return "methodCallBlock" + str(index) + params
         
         
@@ -535,6 +550,7 @@ class CodeGenC(object):
 
             self.method_call_blocks += code + "\n\n"
 
+            params= self.set_pi_and_e(params)
             return "methodCallBlock" + str(index) + params
         
         
@@ -586,6 +602,7 @@ class CodeGenC(object):
 
         self.loop_blocks += code + "\n\n"
 
+        params= self.set_pi_and_e(params)
         return "loopBlock" + str(index) + params
     
     
@@ -675,6 +692,7 @@ class CodeGenC(object):
 
         self.vector_comp += vector_comp + "\n\n"
 
+        params= self.set_pi_and_e(params)
         return "vectorComprehension" + str(index_vec) + params
     
     
@@ -731,6 +749,7 @@ class CodeGenC(object):
 
         self.loop_blocks += code + "\n\n"
 
+        params= self.set_pi_and_e(params)
         return "loopBlock" + str(index) + params
     
     
