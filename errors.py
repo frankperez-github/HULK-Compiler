@@ -53,20 +53,21 @@ class HulkSyntacticError(HulkError):
 
 
 class HulkSemanticError(HulkError):
-    WRONG_SIGNATURE = 'Method \'%s\' already defined in an ancestor with a different signature.'
-    SELF_IS_READONLY = 'Variable "self" is read-only.'
-    INCOMPATIBLE_TYPES = 'Cannot convert \'%s\' into \'%s\'.'
-    VARIABLE_NOT_DEFINED = 'Variable \'%s\' is not defined.'
-    INVALID_OPERATION = 'Operation \'%s\' is not defined between \'%s\' and \'%s\'.'
-    INVALID_UNARY_OPERATION = 'Operation \'%s\' is not defined for \'%s\'.'
-    INCONSISTENT_USE = 'Inconsistent use of \'%s\'.'
-    EXPECTED_ARGUMENTS = 'Expected %s arguments, but got %s in \'%s\'.'
-    CANNOT_INFER_PARAM_TYPE = 'Cannot infer type of parameter \'%s\' in \'%s\'. Please specify it.'
-    CANNOT_INFER_ATTR_TYPE = 'Cannot infer type of attribute \'%s\'. Please specify it.'
-    CANNOT_INFER_RETURN_TYPE = 'Cannot infer return type of \'%s\'. Please specify it.'
-    CANNOT_INFER_VAR_TYPE = 'Cannot infer type of variable \'%s\'. Please specify it.'
-    BASE_OUTSIDE_METHOD = 'Cannot use "base" outside of a method.'
-    METHOD_NOT_DEFINED = 'Method \'%s\' is not defined in any ancestor.'
+    WRONG_SIGNATURE = 'Method \'%s\' already defined in an ancestor with a different signature. Near line \'%s\', column \'%s\''
+    SELF_IS_READONLY = 'Variable "self" is read-only. Near line \'%s\', column \'%s\''
+    INCOMPATIBLE_TYPES = 'Cannot convert \'%s\' into \'%s\'. Near line \'%s\', column \'%s\''
+    VARIABLE_NOT_DEFINED = 'Variable \'%s\' is not defined. Near line \'%s\', column \'%s\''
+    INVALID_OPERATION = 'Operation \'%s\' is not defined between \'%s\' and \'%s\'. Near line \'%s\', column \'%s\''
+    INVALID_UNARY_OPERATION = 'Operation \'%s\' is not defined for \'%s\'. Near line \'%s\', column \'%s\''
+    INCONSISTENT_USE = 'Inconsistent use of \'%s\'. Near line \'%s\', column \'%s\''
+    EXPECTED_ARGUMENTS = 'Expected %s arguments, but got %s in \'%s\'. Near line \'%s\', column \'%s\''
+    CANNOT_INFER_PARAM_TYPE = 'Cannot infer type of parameter \'%s\' in \'%s\'. Please specify it. Near line \'%s\', column \'%s\''
+    CANNOT_INFER_ATTR_TYPE = 'Cannot infer type of attribute \'%s\'. Please specify it. Near line \'%s\', column \'%s\''
+    CANNOT_INFER_RETURN_TYPE = 'Cannot infer return type of \'%s\'. Please specify it. Near line \'%s\', column \'%s\''
+    CANNOT_INFER_VAR_TYPE = 'Cannot infer type of variable \'%s\'. Please specify it. Near line \'%s\', column \'%s\''
+    BASE_OUTSIDE_METHOD = 'Cannot use "base" outside of a method. Near line \'%s\', column \'%s\''
+    METHOD_NOT_DEFINED = 'Method \'%s\' is not defined in any ancestor. Near line \'%s\', column \'%s\''
+    INVALID_OPERATION_FOR_CONSTANT = 'Operation \'%s\' is not defined for constant \'%s\'. Near line \'%s\', column \'%s\''
 
     @property
     def error_type(self):

@@ -42,7 +42,7 @@ class TypeCollector(object):
         self.context.create_function('sin', ['angle'], [number_type], number_type)
         self.context.create_function('cos', ['angle'], [number_type], number_type)
         self.context.create_function('exp', ['value'], [number_type], number_type)
-        self.context.create_function('log', ['value'], [number_type], number_type)
+        self.context.create_function('log', ['base','value'], [number_type,number_type], number_type)
         self.context.create_function('rand', [], [], number_type)
         self.context.create_function('parse', ['value'], [string_type], number_type)
 

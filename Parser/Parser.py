@@ -129,7 +129,6 @@ class ShiftReduceParser:
             state = stack[-1]
             lookahead = w[cursor]
             if self.verbose: print(stack, '<---||--->', w[cursor:])
-            
             if (state, lookahead) in self.action.keys():
                 action, tag = self.action[state, lookahead]
                 if action != self.OK: operations.append(action) 
@@ -154,9 +153,11 @@ class ShiftReduceParser:
                         output.append(tag)
                     #Invalid case
                     case _: 
+                        
                         raise ParserError('Chain cannot be parsed', cursor)
             else:
                 raise ParserError('Chain cannot be parsed', cursor)
+        
         raise ParserError('Chain cannot be parsed', cursor)
 
 

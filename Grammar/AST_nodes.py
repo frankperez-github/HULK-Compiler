@@ -2,8 +2,9 @@ from abc import ABC
 from Semantic.utils import Scope
 
 class Node(ABC):
-    def __init__(self):
-        self.scope: Scope
+    scope: Scope
+    line= '0'
+    column='0'
 
 class ProgramNode(Node):
     def __init__(self, declarations, expression):

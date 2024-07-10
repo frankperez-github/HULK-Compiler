@@ -80,7 +80,7 @@ class TypeBuilder(object):
 
         # Comprobando que el tipo no herede de un tipo incorrecto
         if node.parent in ['Number', 'Boolean', 'String']:
-            self.errors.append(HulkSemanticError(f'Type {node.id} is inheriting from a forbidden type  -_-'))
+            self.errors.append(HulkSemanticError(f'Type {node.id} is inheriting from a forbidden type. Near line: {node.line}, column: {node.column}'))
         elif node.parent is not None:
             try:
                 # Comprobando que no exista dependencia circular
@@ -88,7 +88,7 @@ class TypeBuilder(object):
                 current = parent
                 while current is not None:
                     if current.name == self.current_type.name:
-                        self.errors.append(HulkSemanticError('Circular dependency inheritance  :O'))
+                        self.errors.append(HulkSemanticError(f'Circular dependency inheritance. Near line: {node.line}, column: {node.column}'))
                         parent = ErrorType()
                         break
                     current = current.parent
@@ -165,7 +165,7 @@ class TypeBuilder(object):
                 current = parent
                 while current is not None:
                     if current.name == self.current_type.name:
-                        self.errors.append(HulkSemanticError('Circular dependency inheritance  :O'))
+                        self.errors.append(HulkSemanticError(f'Circular dependency inheritance. Near line: {node.line}, column: {node.column}'))
                         parent = ErrorType()
                         break
                     current = current.parent

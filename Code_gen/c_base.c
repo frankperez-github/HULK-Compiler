@@ -9,8 +9,19 @@
 #define bool int
 #define true 1
 #define false 0
-//#define PI createNumber(3.141592653589793)   
-//#define E createNumber(2.718281828459045) 
+#define PI ({\
+    if (pi_reference==NULL){ \
+        pi_reference= createNumber(3.141592653589793);\
+    }\
+    pi_reference;\
+})
+#define E ({\
+    if (e_reference==NULL){ \
+        e_reference= createNumber(2.718281828459045);\
+    }\
+    e_reference;\
+})
+
 
 //####################################################################################################
 //############################################# E R R O R ############################################
@@ -165,7 +176,7 @@ Object* function_sqrt(Object* number);
 Object* function_sin(Object* angle);
 Object* function_cos(Object* angle);
 Object* function_exp(Object* number);
-Object* function_log(Object* number);
+Object* function_log(Object* base,Object* number);
 Object* function_rand();
 Object* numberGreaterThan(Object* left, Object* right);
 Object* numberGreaterOrEqualThan(Object* left, Object* right);
@@ -219,6 +230,8 @@ Object* method_Range_equals(Object* range1, Object* range2);
 //####################################################################################################
 //############################################ O B J E C T ###########################################
 //####################################################################################################
+
+
 
 Object* createEmptyObject(){
     return malloc(sizeof(Object));
@@ -404,10 +417,18 @@ Object* function_print(Object* obj)
 
 
 Object* createNumber(double number) {
+    
     Object* obj = createObject();
 
     double* value = malloc(sizeof(double));
-    *value = number;
+    if(fabs(number) < 0.0000000001){
+        *value=0;
+    }
+    else{
+        *value = number;
+
+    }
+
 
     setAttribute(obj, "value", value);
     setAttribute(obj, "parent_type0", "Number");
@@ -534,13 +555,14 @@ Object* function_exp(Object* number) {
     return createNumber(exp(*value));
 }
 
-Object* function_log(Object* number) {
-    if(number == NULL)
+Object* function_log(Object* base,Object* number) {
+    if(number == NULL || base == NULL)
         throwError("Null Reference");
 
+    double* base_val = getAttributeValue(base, "value");
     double* value = getAttributeValue(number, "value");
 
-    return createNumber(log(*value));
+    return createNumber(log(*value)/log(*base_val));
 }
 
 Object* function_rand() {
@@ -1059,7 +1081,11 @@ Object* method_Range_equals(Object* range1, Object* range2)
 
     return boolAnd(method_Number_equals(min1, min2), method_Number_equals(max1, max2));
 }
-
+//####################################################################################################
+//######################################### C O N S T A N T S ########################################
+//####################################################################################################
+static Object* pi_reference= NULL;
+static Object* e_reference= NULL;
 //####################################################################################################
 //######################################### G E N E R A T E D ########################################
 //############################################## C O D E #############################################

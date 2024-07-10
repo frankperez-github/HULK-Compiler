@@ -95,8 +95,8 @@ declarations %= declarations + dec_func, lambda h,s: s[1]+[s[2]]
 declarations %= dec_func, lambda h,s: [s[1]]
 declarations %= declarations + type_decl, lambda h,s: s[1]+[s[2]]
 declarations %= type_decl, lambda h,s: [s[1]]
-declarations %= declarations + protocol, lambda h,s: s[1]+[s[2]]
-declarations %= protocol, lambda h,s: [s[1]]
+declarations %= declarations + dec_protocol, lambda h,s: s[1]+[s[2]]
+declarations %= dec_protocol, lambda h,s: [s[1]]
 
 expr %= expr_bloq, lambda h,s: s[1]
 expr %= expr_simp, lambda h,s: s[1]
@@ -265,7 +265,7 @@ func_lis %= sing_func, lambda h,s: [s[1]]
 sing_func %= id_ + opar + ob_params_ann_lis_or_eps + cpar + colon + type_ann +semicolon, lambda h,s: nodes.MethodSignatureDeclarationNode(s[1],s[3],s[6])
 
 ob_params_ann_lis_or_eps %= ob_params_ann_lis, lambda h,s: s[1]
-ob_params_ann_lis_or_eps %= G.Epsilon, lambda h,s: None
+ob_params_ann_lis_or_eps %= G.Epsilon, lambda h,s: []
 
 ob_params_ann_lis %= ob_params_ann, lambda h,s: [s[1]]
 ob_params_ann_lis %= ob_params_ann + semi + ob_params_ann_lis, lambda h,s: [s[1]] + s[3]

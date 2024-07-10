@@ -77,6 +77,29 @@ class CodeGenC(object):
         except:
             pass
         return str_
+    
+    @staticmethod
+    def ignore_pi_and_e(str_: str):
+
+        try:
+            index_pi= str_.index("PI,")
+            str_=str_[:index_pi]+str_[index_pi+3:]
+        except:       
+            try:
+                index_pi= str_.index("PI")
+                str_=str_[:index_pi]+str_[index_pi+2:]
+            except:
+                pass
+        try:
+            index_e= str_.index("E,")
+            str_=str_[:index_e]+str_[index_e+2:]
+        except:    
+            try:
+                index_e= str_.index("E")
+                str_=str_[:index_e]+str_[index_e+1:]
+            except:
+                pass
+        return str_
 
 
 
@@ -93,21 +116,24 @@ class CodeGenC(object):
         params = "("
 
         for var in vars:
-            params += var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                params += var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             params = params[:-2]
 
         params += ")"
+
 
         create_block = "Object* createBlock" + str(self.index_create_blocks) + "("
         index = self.index_create_blocks
         self.index_create_blocks += 1
 
         for var in vars:
-            create_block += "Object* " + var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                create_block += "Object* " + var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             create_block = create_block[:-2]
 
         create_block += ")"
@@ -146,7 +172,8 @@ class CodeGenC(object):
         create_block += def_vars + "\n" + code + "\n}"
         self.create_blocks += create_block + "\n\n"
 
-        params= self.set_pi_and_e(params)
+        #params= self.set_pi_and_e(params)
+        #params = self.ignore_pi_and_e(params)
         return "createBlock" + str(index) + params
     
     
@@ -166,9 +193,10 @@ class CodeGenC(object):
         params = "("
 
         for var in vars:
-            params += var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                params += var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             params = params[:-2]
 
         params += ")"
@@ -178,9 +206,10 @@ class CodeGenC(object):
         self.index_expression_block += 1
 
         for var in vars:
-            code += "Object* " + var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                code += "Object* " + var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             code = code[:-2]
 
         code += ")"
@@ -202,7 +231,8 @@ class CodeGenC(object):
 
 
         self.expression_block += code + "\n\n"
-        params= self.set_pi_and_e(params)
+        #params= self.set_pi_and_e(params)
+        #params= self.ignore_pi_and_e(params)
         return "expressionBlock" + str(index) + params
     
     
@@ -261,9 +291,10 @@ class CodeGenC(object):
         params = "("
 
         for var in vars:
-            params += var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                params += var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             params = params[:-2]
 
         params += ")"
@@ -273,9 +304,10 @@ class CodeGenC(object):
         self.index_let_in_blocks += 1
 
         for var in vars:
-            code += "Object* " + var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                code += "Object* " + var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             code = code[:-2]
 
         code += ")"
@@ -293,7 +325,8 @@ class CodeGenC(object):
         self.let_in_blocks += code + "\n\n"
 
 
-        params= self.set_pi_and_e(params)
+        #params= self.set_pi_and_e(params)
+        #params= self.ignore_pi_and_e(params)
         return "letInNode" + str(index) + params
     
     
@@ -308,6 +341,9 @@ class CodeGenC(object):
             code = code[:-2]
 
         code += ")"
+        #code = self.set_pi_and_e(code)
+        #code= self.ignore_pi_and_e(code)
+
 
         return code
     
@@ -346,6 +382,8 @@ class CodeGenC(object):
                 code += ", copyObject(" + self.visit(arg) + ")"
 
             code += ")"
+            #code= self.set_pi_and_e(code)
+            #code= self.ignore_pi_and_e(code)
 
             return code
 
@@ -355,9 +393,10 @@ class CodeGenC(object):
             params = "("
 
             for var in vars:
-                params += var.nameC + ", "
+                if(var.nameC not in ['PI','E']):
+                    params += var.nameC + ", "
 
-            if len(vars) > 0:
+            if len(vars) > 2:
                 params = params[:-2]
 
             params += ")"
@@ -367,9 +406,10 @@ class CodeGenC(object):
             self.index_method_call_blocks += 1
 
             for var in vars:
-                code += "Object* " + var.nameC + ", "
+                if(var.nameC not in ['PI','E']):
+                    code += "Object* " + var.nameC + ", "
 
-            if len(vars) > 0:
+            if len(vars) > 2:
                 code = code[:-2]
 
             code += ")"
@@ -390,7 +430,8 @@ class CodeGenC(object):
 
             self.method_call_blocks += code + "\n\n"
 
-            params= self.set_pi_and_e(params)
+            #params= self.set_pi_and_e(params)
+            #params= self.ignore_pi_and_e(params)
             return "methodCallBlock" + str(index) + params
         
         
@@ -401,9 +442,10 @@ class CodeGenC(object):
         params = "("
 
         for var in vars:
-            params += var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                params += var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             params = params[:-2]
 
         params += ")"
@@ -413,9 +455,10 @@ class CodeGenC(object):
         self.index_if_else_blocks += 1
 
         for var in vars:
-            code += "Object* " + var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                code += "Object* " + var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             code = code[:-2]
 
         code += ")"
@@ -441,7 +484,8 @@ class CodeGenC(object):
 
         self.if_else_blocks += code + "\n\n"
 
-        params= self.set_pi_and_e(params)
+        #params= self.set_pi_and_e(params)
+        #params= self.ignore_pi_and_e(params)
         return "ifElseBlock" + str(index) + params
     
     
@@ -471,9 +515,10 @@ class CodeGenC(object):
             params = "("
 
             for var in vars:
-                params += var.nameC + ", "
+                if(var.nameC not in ['PI','E']):
+                    params += var.nameC + ", "
 
-            if len(vars) > 0:
+            if len(vars) > 2:
                 params = params[:-2]
 
             params += ")"
@@ -483,9 +528,10 @@ class CodeGenC(object):
             self.index_method_call_blocks += 1
 
             for var in vars:
-                code += "Object* " + var.nameC + ", "
+                if(var.nameC not in ['PI','E']):
+                    code += "Object* " + var.nameC + ", "
 
-            if len(vars) > 0:
+            if len(vars) > 2:
                 code = code[:-2]
 
             code += ")"
@@ -503,7 +549,8 @@ class CodeGenC(object):
 
             self.method_call_blocks += code + "\n\n"
 
-            params= self.set_pi_and_e(params)
+            #params= self.set_pi_and_e(params)
+            #params= self.ignore_pi_and_e(params)
             return "methodCallBlock" + str(index) + params
         
         
@@ -524,9 +571,10 @@ class CodeGenC(object):
             params = "("
 
             for var in vars:
-                params += var.nameC + ", "
+                if(var.nameC not in ['PI','E']):
+                    params += var.nameC + ", "
 
-            if len(vars) > 0:
+            if len(vars) > 2:
                 params = params[:-2]
 
             params += ")"
@@ -536,9 +584,10 @@ class CodeGenC(object):
             self.index_method_call_blocks += 1
 
             for var in vars:
-                code += "Object* " + var.nameC + ", "
+                if(var.nameC not in ['PI','E']):
+                    code += "Object* " + var.nameC + ", "
 
-            if len(vars) > 0:
+            if len(vars) > 2:
                 code = code[:-2]
 
             code += ")"
@@ -556,7 +605,8 @@ class CodeGenC(object):
 
             self.method_call_blocks += code + "\n\n"
 
-            params= self.set_pi_and_e(params)
+            #params= self.set_pi_and_e(params)
+            #params= self.ignore_pi_and_e(params)
             return "methodCallBlock" + str(index) + params
         
         
@@ -576,9 +626,10 @@ class CodeGenC(object):
         params = "("
 
         for var in vars:
-            params += var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                params += var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             params = params[:-2]
 
         params += ")"
@@ -588,9 +639,10 @@ class CodeGenC(object):
         self.index_loop_blocks += 1
 
         for var in vars:
-            code += "Object* " + var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                code += "Object* " + var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             code = code[:-2]
 
         code += ")"
@@ -608,7 +660,8 @@ class CodeGenC(object):
 
         self.loop_blocks += code + "\n\n"
 
-        params= self.set_pi_and_e(params)
+        #params= self.set_pi_and_e(params)
+        #params= self.ignore_pi_and_e(params)
         return "loopBlock" + str(index) + params
     
     
@@ -640,7 +693,8 @@ class CodeGenC(object):
         vars = node.scope.get_variables(True)
 
         for var in vars:
-            selector += "Object* " + var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                selector += "Object* " + var.nameC + ", "
 
         selector += "Object* " + var_iter
 
@@ -658,9 +712,10 @@ class CodeGenC(object):
         self.index_vector_comp += 1
 
         for var in vars:
-            vector_comp += "Object* " + var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                vector_comp += "Object* " + var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             vector_comp = vector_comp[:-2]
 
         vector_comp += ")"
@@ -679,15 +734,27 @@ class CodeGenC(object):
         vector_comp += "   for(int i = 0; i < size; i++) {\n"
         vector_comp += "      next(iterable);\n"
         vector_comp += "      new_list[i] = selector" + str(index_selector)
-
+        '''
         params = "("
 
+        
         for var in vars:
             params += var.nameC + ", "
 
         vector_comp += params + "current(iterable));\n"
 
         if len(vars) > 0:
+            params = params[:-2]
+
+        params += ")"'''
+
+        params = "("
+
+        for var in vars:
+            if(var.nameC not in ['PI','E']):
+                params += var.nameC + ", "
+        vector_comp += params + "current(iterable));\n"
+        if len(vars) > 2:
             params = params[:-2]
 
         params += ")"
@@ -698,7 +765,8 @@ class CodeGenC(object):
 
         self.vector_comp += vector_comp + "\n\n"
 
-        params= self.set_pi_and_e(params)
+        #params= self.set_pi_and_e(params)
+        #params= self.ignore_pi_and_e(params)
         return "vectorComprehension" + str(index_vec) + params
     
     
@@ -718,9 +786,10 @@ class CodeGenC(object):
         params = "("
 
         for var in vars:
-            params += var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                params += var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             params = params[:-2]
 
         params += ")"
@@ -730,9 +799,10 @@ class CodeGenC(object):
         self.index_loop_blocks += 1
 
         for var in vars:
-            code += "Object* " + var.nameC + ", "
+            if(var.nameC not in ['PI','E']):
+                code += "Object* " + var.nameC + ", "
 
-        if len(vars) > 0:
+        if len(vars) > 2:
             code = code[:-2]
 
         code += ")"
@@ -755,7 +825,8 @@ class CodeGenC(object):
 
         self.loop_blocks += code + "\n\n"
 
-        params= self.set_pi_and_e(params)
+        #params= self.set_pi_and_e(params)
+        #params= self.ignore_pi_and_e(params)
         return "loopBlock" + str(index) + params
     
     

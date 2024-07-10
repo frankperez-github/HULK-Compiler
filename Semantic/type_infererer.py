@@ -15,6 +15,7 @@ class TypeInferrer(object):
         self.current_method = None
         self.errors= errors
         self.had_changed = False
+        self.c=0
 
     def assign_auto_type(self, node:nodes.Node, scope: Scope, inf_type: Type | Protocol):
         """
@@ -33,6 +34,27 @@ class TypeInferrer(object):
         if isinstance(node, nodes.IndexingNode):
             self.assign_auto_type(node.obj, scope, VectorType(inf_type))
 
+        if isinstance(node, nodes.AttributeCallNode):
+            
+            if(node.obj.lex=='self'):
+                try:
+                    attr = self.current_type.get_attribute(node.attribute)
+                    if(isinstance(attr.type,AutoType)):
+                        attr.type=inf_type
+                    return
+                except HulkSemanticError:
+                    return 
+            else:
+                try:
+                    attr = self.context.get_type(node.obj.lex).get_attribute(node.attribute)
+                    if(isinstance(attr.type,AutoType)):
+                        attr.type=inf_type
+                    return
+                except HulkSemanticError:
+                    return 
+
+            
+
     @visitor.on('node')
     def visit(self, node: nodes.Node):
         pass
@@ -45,14 +67,14 @@ class TypeInferrer(object):
 
         self.visit(node.expression)
 
-        if self.had_changed :
+        if self.had_changed and self.c <500:
             self.had_changed = False
+            self.c+=1
             self.visit(node)
 
     @visitor.when(nodes.TypeDeclarationNode)
     def visit(self, node: nodes.TypeDeclarationNode):
         self.current_type = self.context.get_type(node.id)
-
         if self.current_type.is_error():
             return
 
@@ -105,6 +127,12 @@ class TypeInferrer(object):
         for method in node.methods:
             self.visit(method)
 
+        for attr in node.attributes:
+            if (isinstance(attr.expr,nodes.VariableNode) and not isinstance(self.current_type.get_attribute(attr.id).type,AutoType)):
+                param_var=const_scope.find_variable(attr.expr.lex)
+                if(param_var is not None):
+                        param_var.inferred_types.append(self.current_type.get_attribute(attr.id).type)
+                 
         self.current_type = None
 
     @visitor.when(nodes.AttributeDeclarationNode)
@@ -233,6 +261,11 @@ class TypeInferrer(object):
 
         if old_type.name == 'Self':
             return ErrorType()
+
+
+        if(isinstance(node.id,nodes.AttributeCallNode) and isinstance(old_type,AutoType) and not isinstance(new_type,AutoType)):
+            self.assign_auto_type(node.id, node.scope, new_type)
+
 
         if isinstance(new_type, AutoType) and not isinstance(old_type, AutoType):
             self.assign_auto_type(node.expr, node.scope, old_type)
