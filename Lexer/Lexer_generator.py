@@ -57,7 +57,7 @@ class Lexer:
 
     def tokens_generator(self, text):
         rows = text.split('\n')
-        row = 0
+        row = 1
         column = 1
         while text:
             
@@ -74,11 +74,11 @@ class Lexer:
             if token_type != 'space' and token_type != 'endofline':
                 yield Token(lex=lex, token_type=token_type, column=column, row=row)
 
-            column += len(lex)
-            if column > len(rows[row])+1: 
+            if token_type == 'endofline':
                 row += 1
                 column = 0
+            else:
+                column += len(lex)
 
         
-        yield Token("$", self.eof, column=column, row=row)    
-    
+        yield Token("$", self.eof, column=column, row=row)

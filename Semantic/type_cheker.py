@@ -141,7 +141,7 @@ class TypeChecker(object):
 
         inf_type = self.visit(node.expr)
         var_type = scope.find_variable(node.id).type
-
+        
         if not inf_type.conforms_to(var_type):
             error_text = HulkSemanticError.INCOMPATIBLE_TYPES % (inf_type.name, var_type.name,node.line , node.column)
             self.errors.append(HulkSemanticError(error_text))

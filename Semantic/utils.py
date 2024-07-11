@@ -19,12 +19,12 @@ class Function:
         for i, param_type in enumerate(self.param_types):
             if isinstance(param_type, AutoType):
                 param_name = self.param_names[i]
-                error_message = HulkSemanticError.CANNOT_INFER_PARAM_TYPE % (param_name, self.name)
+                error_message = HulkSemanticError.CANNOT_INFER_PARAM_TYPE % (param_name, self.name, self.node.line, self.node.column)
                 errors.append(HulkSemanticError(error_message))
                 self.param_types[i] = ErrorType()
 
         if self.return_type == AutoType() and not self.return_type.is_error():
-            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_RETURN_TYPE % self.name))
+            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_RETURN_TYPE % (self.name,self.node.line, self.node.column)))
             self.return_type = ErrorType()
         return errors
 
@@ -46,9 +46,9 @@ class Context:
 
     def create_type(self, name: str, node=None) -> Type:
         if name in self.types:
-            raise HulkSemanticError(f'Type with the same name ({name}) already in context.')
+            raise HulkSemanticError(f'Type with the same name ({name}) already in context. Near line: {node.line}, column: {node.column}')
         if name in self.protocols:
-            raise HulkSemanticError(f'Protocol with the same name ({name}) already in context.')
+            raise HulkSemanticError(f'Protocol with the same name ({name}) already in context. Near line: {node.line}, column: {node.column}')
         typex = self.types[name] = Type(name, node)
         return typex
 
@@ -65,9 +65,9 @@ class Context:
 
     def create_protocol(self, name: str, node=None) -> Protocol:
         if name in self.protocols:
-            raise HulkSemanticError(f'Protocol with the same name ({name}) already in context.')
+            raise HulkSemanticError(f'Protocol with the same name ({name}) already in context. Near line: {node.line}, column: {node.column}')
         if name in self.types:
-            raise HulkSemanticError(f'Type with the same name ({name}) already in context.')
+            raise HulkSemanticError(f'Type with the same name ({name}) already in context. Near line: {node.line}, column: {node.column}')
         protocol = self.protocols[name] = Protocol(name, node)
         return protocol
 
@@ -87,17 +87,17 @@ class Context:
             except HulkSemanticError:
                 return self.get_type(ttype)
 
-    def set_type_or_protocol_error(self, name):
-        if name in self.types:
-            self.types[name] = ErrorType()
-        elif name in self.protocols:
-            self.protocols[name] = ErrorType()
-        else:
-            raise HulkSemanticError(f'Type or protocol "{name}" is not defined.')
+    def set_type_error(self, name):
+        self.types[name] = ErrorType()
+
+        
+    def set_protocol_error(self, name):
+        self.protocols[name] = ErrorType()
+        
 
     def create_function(self, name: str, params_names: list, params_types: list, return_type, node=None) -> Function:
         if name in self.functions:
-            raise HulkSemanticError(f'Function with the same name ({name}) already in context.')
+            raise HulkSemanticError(f'Function with the same name ({name}) already in context. Near line: {node.line}, column: {node.column}')
         function = self.functions[name] = Function(name, params_names, params_types, return_type, node)
         return function
 
@@ -153,7 +153,7 @@ class VariableInfo:
         errors = []
         if self.type == AutoType() and not self.type.is_error():
             self.type = ErrorType()
-            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_VAR_TYPE % self.name))
+            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_VAR_TYPE % (self.name, '?', '?')))
 
         return errors
 

@@ -108,7 +108,13 @@ class TypeInferrer(object):
                 try:
                     new_type = get_most_specialized_type(local_var.inferred_types, var_name=param_name)
                 except HulkSemanticError as e:
-                    self.errors.append(e)
+                    text_error= e.text
+                    index=text_error.find('0')
+                    text_error=text_error[:index]+f'{node.line}'+text_error[index+1:]
+                    index1=text_error.find('0')
+                    text_error=text_error[:index1]+f'{node.column}'+text_error[index1+1:]
+                    new_error= HulkSemanticError(text_error)
+                    self.errors.append(new_error)
                     new_type = ErrorType()
                 self.current_type.params_types[i] = new_type
                 if not isinstance(new_type, AutoType):
@@ -174,7 +180,13 @@ class TypeInferrer(object):
                 try:
                     new_type = get_most_specialized_type(local_var.inferred_types, var_name=param_name)
                 except HulkSemanticError as e:
-                    self.errors.append(e)
+                    text_error= e.text
+                    index=text_error.find('0')
+                    text_error=text_error[:index]+f'{node.line}'+text_error[index+1:]
+                    index1=text_error.find('0')
+                    text_error=text_error[:index1]+f'{node.column}'+text_error[index1+1:]
+                    new_error= HulkSemanticError(text_error)
+                    self.errors.append(new_error)
                     new_type = ErrorType()
                 function.param_types[i] = new_type
                 if not isinstance(new_type, AutoType):
@@ -214,7 +226,13 @@ class TypeInferrer(object):
                 try:
                     new_type = get_most_specialized_type(local_var.inferred_types, var_name=param_name)
                 except HulkSemanticError as e:
-                    self.errors.append(e)
+                    text_error= e.text
+                    index=text_error.find('0')
+                    text_error=text_error[:index]+f'{node.line}'+text_error[index+1:]
+                    index1=text_error.find('0')
+                    text_error=text_error[:index1]+f'{node.column}'+text_error[index1+1:]
+                    new_error= HulkSemanticError(text_error)
+                    self.errors.append(new_error)
                     new_type = ErrorType()
                 self.current_method.param_types[i] = new_type
                 if not isinstance(new_type, AutoType):

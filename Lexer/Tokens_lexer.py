@@ -1,4 +1,3 @@
-
 import Grammar.Grammar as Gr
 
 tokens = [
@@ -46,7 +45,7 @@ tokens = [
     (Gr.pow__, '\*\*'),
     
     (Gr.bool_, 'true|false'),
-    (Gr.str_, '"([\x00-!#-\x7f]|\\\\")*"'),
+    (Gr.str_, '("([\x00-!#-\x7f]|\\\\")*"|\\"([\x00-!#-\x7f]|\\\\")*\\"")'),
     (Gr.number_, '(0|[1-9][0-9]*)(.[0-9]+)?'),
     
     (Gr.let_, 'let'),

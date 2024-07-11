@@ -10,7 +10,7 @@ class Attribute:
     def inference_errors(self):
         errors = []
         if self.type == AutoType() and not self.type.is_error():
-            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_ATTR_TYPE % self.name))
+            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_ATTR_TYPE % (self.name, self.node.line, self.node.column)))
             self.type = ErrorType()
         return errors
     
@@ -50,12 +50,12 @@ class Method:
         for i, param_type in enumerate(self.param_types):
             if isinstance(param_type, AutoType) and not param_type.is_error():
                 param_name = self.param_names[i]
-                error_message = HulkSemanticError.CANNOT_INFER_PARAM_TYPE % (param_name, self.name)
+                error_message = HulkSemanticError.CANNOT_INFER_PARAM_TYPE % (param_name, self.name,self.node.line, self.node.column)
                 errors.append(HulkSemanticError(error_message))
                 self.param_types[i] = ErrorType()
 
         if self.return_type == AutoType() and not self.return_type.is_error():
-            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_RETURN_TYPE % self.name))
+            errors.append(HulkSemanticError(HulkSemanticError.CANNOT_INFER_RETURN_TYPE % self.name, self.node.line, self.node.column))
             self.return_type = ErrorType()
         return errors
     
@@ -78,7 +78,7 @@ class Protocol:
 
     def set_parent(self, parent):
         if self.parent is not None:
-            raise HulkSemanticError(f'Parent type is already set for {self.name}.')
+            raise HulkSemanticError(f'Parent type is already set for {self.name}. Near line: {self.node.line}, column: {self.node.column}')
         self.parent = parent
 
     def get_method(self, name: str):
@@ -86,19 +86,23 @@ class Protocol:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
             if self.parent is None:
-                raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}.')
+                raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}. Near line: {self.node.line}, column: {self.node.column}')
             try:
                 return self.parent.get_method(name)
             except HulkSemanticError:
-                raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}.')
+                raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}. Near line: {self.node.line}, column: {self.node.column}')
 
     def define_method(self, name: str, param_names: list, param_types: list, return_type, node=None):
         if name in (method.name for method in self.methods):
-            raise HulkSemanticError(f'Method "{name}" already defined in {self.name}')
+            raise HulkSemanticError(f'Method "{name}" already defined in {self.name}. Near line: {self.node.line}, column: {self.node.column}')
         method = Method(name, param_names, param_types, return_type, node)
         self.methods.append(method)
         return method
 
+    def get_all_methods(self):
+        if(self.parent is None):
+            return self.methods
+        else: return self.methods + self.parent.get_all_methods()
     
     def _not_ancestor_conforms_to(self, other):
         if not isinstance(other, Protocol):
@@ -152,14 +156,17 @@ class Type:
 
     def set_parent(self, parent):
         if self.parent is not None:
-            raise HulkSemanticError(f'Parent type is already set for {self.name}.')
+            raise HulkSemanticError(f'Parent type is already set for {self.name}. Near line: {self.node.line}, column: {self.node.column}')
         self.parent = parent
 
     def get_attribute(self, name: str) -> Attribute:
         try:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
-            raise HulkSemanticError(f'Attribute "{name}" is not defined in {self.name}.')
+            if self.node is not None:
+                raise HulkSemanticError(f'Attribute "{name}" is not defined in {self.name}. Near line: {self.node.line}, column: {self.node.column}')
+            else:
+                raise HulkSemanticError(f'Attribute "{name}" is not defined in {self.name}.')
 
     def define_attribute(self, name: str, typex, node=None) -> Attribute:
         try:
@@ -169,22 +176,26 @@ class Type:
             self.attributes.append(attribute)
             return attribute
         else:
-            raise HulkSemanticError(f'Attribute "{name}" is already defined in {self.name}.')
+            raise HulkSemanticError(f'Attribute "{name}" is already defined in {self.name}. Near line: {self.node.line}, column: {self.node.column}')
 
     def get_method(self, name: str) -> Method:
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
             if self.parent is None:
-                raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}.')
+                if self.node is not None:
+                    raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}. Near line: {self.node.line}, column: {self.node.column}')
+                else: raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}.')
             try:
                 return self.parent.get_method(name)
             except HulkSemanticError:
-                raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}.')
+                if self.node is not None:
+                    raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}. Near line: {self.node.line}, column: {self.node.column}')
+                else: raise HulkSemanticError(f'Method "{name}" is not defined in {self.name}.')
 
     def define_method(self, name: str, param_names: list, param_types: list, return_type, node=None) -> Method:
         if name in (method.name for method in self.methods):
-            raise HulkSemanticError(f'Method "{name}" already defined in {self.name}')
+            raise HulkSemanticError(f'Method "{name}" already defined in {self.name}. Near line: {self.node.line}, column: {self.node.column}')
         method = Method(name, param_names, param_types, return_type, node)
         self.methods.append(method)
         return method
@@ -212,7 +223,7 @@ class Type:
             return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
         elif isinstance(other, Protocol):
             try:
-                return all(method.can_substitute_with(self.get_method(method.name)) for method in other.methods)
+                return all(method.can_substitute_with(self.get_method(method.name)) for method in other.get_all_methods())
             # If a method is not defined in the current type (or its ancestors), then it is not conforming
             except HulkSemanticError:
                 return False
@@ -229,7 +240,7 @@ class Type:
         for i, param_type in enumerate(self.params_types):
             if isinstance(param_type, AutoType):
                 param_name = self.params_names[i]
-                error_message = HulkSemanticError.CANNOT_INFER_PARAM_TYPE % (param_name, self.name)
+                error_message = HulkSemanticError.CANNOT_INFER_PARAM_TYPE % (param_name, self.name, self.node.line, self.node.column)
                 errors.append(HulkSemanticError(error_message))
                 self.params_types[i] = ErrorType()
         return errors
@@ -416,5 +427,5 @@ def get_most_specialized_type(types, var_name: str):
         if typex.conforms_to(most_specialized):
             most_specialized = typex
         elif not most_specialized.conforms_to(typex):
-            raise HulkSemanticError(HulkSemanticError.INCONSISTENT_USE % var_name)
+            raise HulkSemanticError(HulkSemanticError.INCONSISTENT_USE % (var_name,'0', '0'))
     return most_specialized

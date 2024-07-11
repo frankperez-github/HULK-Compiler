@@ -51,6 +51,7 @@ class TypeCollector(object):
         iterable_protocol.define_method('next', [], [], bool_type)
         iterable_protocol.define_method('current', [], [], object_type)
 
+        
         range_type = self.context.create_type('Range')
         range_type.set_parent(object_type)
         range_type.params_names, range_type.params_types = ['min', 'max'], [number_type, number_type]
@@ -59,6 +60,7 @@ class TypeCollector(object):
         range_type.define_attribute('current', number_type)
         range_type.define_method('next', [], [], bool_type)
         range_type.define_method('current', [], [], number_type)
+        
 
         self.context.create_function('range', ['min', 'max'], [number_type, number_type], range_type)
 
@@ -73,7 +75,7 @@ class TypeCollector(object):
             self.context.create_type(node.id, node)
         except HulkSemanticError as e:
             self.errors.append(e)
-            self.context.set_type_or_protocol_error(node.id)
+            self.context.set_type_error(node.id)
 
     @visitor.when(nodes.ProtocolDeclarationNode)
     def visit(self, node: nodes.ProtocolDeclarationNode):
@@ -82,5 +84,5 @@ class TypeCollector(object):
             self.context.create_protocol(node.id, node)
         except HulkSemanticError as e:
             self.errors.append(e)
-            self.context.set_type_or_protocol_error(node.id)
+            self.context.set_protocol_error(node.id)
 

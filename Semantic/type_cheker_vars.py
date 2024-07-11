@@ -74,6 +74,25 @@ class VarCollector(object):
         for method in node.methods:
             self.visit(method, methods_scope.create_child())
 
+    @visitor.when(nodes.ProtocolDeclarationNode)
+    def visit(self, node: nodes.ProtocolDeclarationNode, scope: Scope):
+        current_protocol= self.context.get_protocol(node.id)
+
+        if current_protocol.is_error():
+            return
+        
+        if current_protocol.parent is not None:
+            for method in node.methods_signature:
+                try:
+                    m= current_protocol.parent.get_method(method.id)
+                    error= HulkSemanticError(f"Method {method.id} already defined in an ancestor. Near line: {method.line}, column: {method.column}")
+                    self.errors.append(error)
+                except:
+                    pass
+
+
+
+
     @visitor.when(nodes.AttributeDeclarationNode)
     def visit(self, node: nodes.AttributeDeclarationNode, scope: Scope):
         node.scope = scope
