@@ -108,7 +108,7 @@ class Protocol:
         if not isinstance(other, Protocol):
             return False
         try:
-            return all(method.can_substitute_with(self.get_method(method.name)) for method in other.methods)
+            return all(method.can_substitute_with(self.get_method(method.name)) for method in other.get_all_methods())
         # If a method is not defined in the current type (or its ancestors), then it is not conforming
         except HulkSemanticError:
             return False

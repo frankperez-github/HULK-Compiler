@@ -40,7 +40,7 @@ class TypeBuilder(object):
         except HulkSemanticError as e:
             self.errors.append(e)
 
-        # Para los tipos que no especifican sus parametros
+    # Para los tipos que no especifican sus parametros
     def get_params_names_and_types(self, node):
         if node.params_ids is None or node.params_types is None:
            return [], []
